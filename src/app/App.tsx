@@ -572,18 +572,18 @@ function TapMedallion({ onTap, tapPower }: { onTap: () => void; tapPower: number
   };
 
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center">
+    <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-6">
       {/* Museum exhibit container - perfectly centered */}
       <div className="flex flex-col items-center">
         
-        {/* Concentric sacred circles - museum pedestal effect */}
+        {/* Concentric sacred circles - museum pedestal effect - perfectly centered */}
         <div className="relative flex items-center justify-center">
           {/* Outermost circle */}
           <div 
             className="absolute rounded-full border animate-pulse"
             style={{ 
-              width: '280px', 
-              height: '280px', 
+              width: '420px', 
+              height: '420px', 
               borderColor: `${epoch.colors.primary}12`,
               animationDuration: '4s',
             }} 
@@ -592,8 +592,8 @@ function TapMedallion({ onTap, tapPower }: { onTap: () => void; tapPower: number
           <div 
             className="absolute rounded-full border"
             style={{ 
-              width: '240px', 
-              height: '240px', 
+              width: '360px', 
+              height: '360px', 
               borderColor: `${epoch.colors.primary}18`,
               animation: 'spin 60s linear infinite',
             }} 
@@ -602,8 +602,8 @@ function TapMedallion({ onTap, tapPower }: { onTap: () => void; tapPower: number
           <div 
             className="absolute rounded-full border"
             style={{ 
-              width: '200px', 
-              height: '200px', 
+              width: '300px', 
+              height: '300px', 
               borderColor: `${epoch.colors.primary}25`,
               animation: 'spin 45s linear infinite reverse',
             }} 
@@ -612,35 +612,36 @@ function TapMedallion({ onTap, tapPower }: { onTap: () => void; tapPower: number
           <div 
             className="absolute rounded-full border"
             style={{ 
-              width: '160px', 
-              height: '160px', 
+              width: '240px', 
+              height: '240px', 
               borderColor: `${epoch.colors.primary}35`,
               animation: 'spin 30s linear infinite',
             }} 
           />
           
-          {/* Golden glow halo behind artifact */}
+          {/* Enhanced golden glow halo behind artifact */}
           <div 
-            className="absolute w-32 h-32 rounded-full blur-3xl"
+            className="absolute w-56 h-56 rounded-full blur-3xl"
             style={{ 
-              backgroundColor: `${epoch.colors.primary}25`,
-              boxShadow: `0 0 80px 20px ${epoch.colors.primary}15`,
+              backgroundColor: `${epoch.colors.primary}35`,
+              boxShadow: `0 0 120px 40px ${epoch.colors.primary}25, 0 0 200px 60px ${epoch.colors.primary}15`,
             }} 
           />
           
-          {/* Main artifact button */}
+          {/* Main artifact button - 50% larger */}
           <motion.button
             animate={{ scale: pressing ? 0.92 : 1 }}
             transition={{ duration: 0.1, ease: "easeOut" }}
-            className="relative w-28 h-28 rounded-full flex flex-col items-center justify-center cursor-pointer z-10"
+            className="relative w-44 h-44 rounded-full flex flex-col items-center justify-center cursor-pointer z-10"
             style={{
-              background: `radial-gradient(circle at 30% 30%, ${epoch.colors.primary}40, ${epoch.colors.background} 70%)`,
-              border: `3px solid ${epoch.colors.primary}80`,
+              background: `radial-gradient(circle at 30% 30%, ${epoch.colors.primary}50, ${epoch.colors.background} 70%)`,
+              border: `4px solid ${epoch.colors.primary}90`,
               boxShadow: `
-                0 0 60px ${epoch.colors.primary}30,
-                0 0 100px ${epoch.colors.primary}15,
-                inset 0 2px 20px ${epoch.colors.primary}20,
-                inset 0 -4px 10px rgba(0,0,0,0.5)
+                0 0 80px ${epoch.colors.primary}40,
+                0 0 150px ${epoch.colors.primary}25,
+                0 0 200px ${epoch.colors.primary}15,
+                inset 0 2px 30px ${epoch.colors.primary}30,
+                inset 0 -6px 15px rgba(0,0,0,0.5)
               `,
             }}
             onTouchStart={e => { setPressing(true); fire(e); }}
@@ -651,65 +652,107 @@ function TapMedallion({ onTap, tapPower }: { onTap: () => void; tapPower: number
           >
             {/* Inner decorative ring */}
             <div 
-              className="absolute inset-3 rounded-full border"
-              style={{ borderColor: `${epoch.colors.primary}30` }} 
+              className="absolute inset-4 rounded-full border"
+              style={{ borderColor: `${epoch.colors.primary}40` }} 
             />
             {/* Artifact icon */}
-            <span className="text-6xl select-none relative z-10">{epoch.icon}</span>
+            <span className="text-8xl select-none relative z-10">{epoch.icon}</span>
           </motion.button>
         </div>
 
-        {/* Artifact name - museum plaque style */}
-        <div className="mt-8 text-center">
+        {/* Action text - НАТИСНИ */}
+        <div className="mt-6 text-center">
           <h2 
-            className="text-lg font-bold uppercase"
+            className="text-2xl font-bold uppercase"
             style={{ 
               fontFamily: "'Cinzel', serif",
               color: epoch.colors.primary,
-              textShadow: `0 0 20px ${epoch.colors.primary}40`,
-              letterSpacing: '0.5em',
+              textShadow: `0 0 30px ${epoch.colors.primary}50`,
+              letterSpacing: '0.4em',
             }}
           >
-            НАМІСТИ
+            НАТИСНИ
           </h2>
           {/* Decorative line under name */}
-          <div className="flex items-center justify-center gap-3 mt-2">
-            <div className="h-px w-12" style={{ backgroundColor: `${epoch.colors.primary}40` }} />
-            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: epoch.colors.primary }} />
-            <div className="h-px w-12" style={{ backgroundColor: `${epoch.colors.primary}40` }} />
+          <div className="flex items-center justify-center gap-4 mt-2">
+            <div className="h-px w-16" style={{ backgroundColor: `${epoch.colors.primary}50` }} />
+            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: epoch.colors.primary, boxShadow: `0 0 10px ${epoch.colors.primary}` }} />
+            <div className="h-px w-16" style={{ backgroundColor: `${epoch.colors.primary}50` }} />
           </div>
         </div>
 
-        {/* Reward button - museum display info */}
-        <div className="mt-6">
+        {/* XP Reward button */}
+        <div className="mt-5">
           <motion.button
             whileTap={{ scale: 0.95 }}
-            className="px-6 py-2.5 rounded-full font-semibold text-sm flex items-center gap-2"
+            className="px-8 py-3 rounded-full font-semibold text-base flex items-center gap-2"
             style={{
-              background: `linear-gradient(135deg, ${epoch.colors.primary}30, ${epoch.colors.primary}15)`,
-              border: `1px solid ${epoch.colors.primary}50`,
+              background: `linear-gradient(135deg, ${epoch.colors.primary}40, ${epoch.colors.primary}20)`,
+              border: `2px solid ${epoch.colors.primary}60`,
               color: epoch.colors.primary,
-              boxShadow: `0 0 20px ${epoch.colors.primary}20`,
+              boxShadow: `0 0 30px ${epoch.colors.primary}30`,
               fontFamily: "'Cinzel', serif",
-              letterSpacing: '0.1em',
+              letterSpacing: '0.15em',
             }}
             onClick={fire}
           >
-            <span className="text-lg">⚡</span>
+            <span className="text-xl">⚡</span>
             <span>+{tapPower} XP</span>
           </motion.button>
         </div>
-        
-        {/* Subtle instruction */}
-        <p 
-          className="mt-4 text-[10px] uppercase"
-          style={{ 
-            color: `${epoch.colors.primary}50`,
-            fontFamily: "'Cinzel', serif",
-            letterSpacing: '0.3em',
+
+        {/* Historical Card - Museum Style */}
+        <div 
+          className="mt-6 mx-4 px-6 py-4 rounded-2xl max-w-xs text-center"
+          style={{
+            background: `linear-gradient(135deg, ${epoch.colors.primary}08, ${epoch.colors.background}cc)`,
+            border: `1px solid ${epoch.colors.primary}25`,
+            boxShadow: `0 0 20px ${epoch.colors.primary}10, inset 0 1px 0 ${epoch.colors.primary}15`,
           }}
         >
-          Торкніться експоната
+          {/* Era title */}
+          <h3 
+            className="text-sm font-bold uppercase tracking-wider mb-1"
+            style={{ 
+              fontFamily: "'Cinzel', serif",
+              color: epoch.colors.primary,
+              textShadow: `0 0 15px ${epoch.colors.primary}30`,
+            }}
+          >
+            {epoch.name}
+          </h3>
+          {/* Period */}
+          <p 
+            className="text-xs mb-2"
+            style={{ 
+              color: `${epoch.colors.primary}80`,
+              fontFamily: "'Cinzel', serif",
+            }}
+          >
+            {epoch.period}
+          </p>
+          {/* Quote */}
+          <p 
+            className="text-[11px] italic leading-relaxed"
+            style={{ 
+              color: `${epoch.colors.textPrimary}70`,
+              fontFamily: "'Georgia', serif",
+            }}
+          >
+            «Період розквіту українського козацтва та формування Гетьманщини.»
+          </p>
+        </div>
+        
+        {/* Instruction text */}
+        <p 
+          className="mt-5 text-[11px] uppercase"
+          style={{ 
+            color: `${epoch.colors.primary}40`,
+            fontFamily: "'Cinzel', serif",
+            letterSpacing: '0.25em',
+          }}
+        >
+          Натисни, щоб отримати XP
         </p>
       </div>
     </div>
@@ -1653,10 +1696,10 @@ function TapPage() {
         </motion.div>
       )}
 
-      {/* Decorative rings */}
+      {/* Decorative rings - perfectly centered */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="absolute rounded-full border" style={{ width: `${250 + i * 100}px`, height: `${250 + i * 100}px`, borderColor: `${epoch.colors.primary}${Math.max(5, 20 - i * 7)}`, animation: `spin ${20 + i * 10}s linear infinite`, animationDirection: i % 2 === 0 ? 'reverse' : 'normal' }} />
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="absolute rounded-full border" style={{ width: `${380 + i * 80}px`, height: `${380 + i * 80}px`, borderColor: `${epoch.colors.primary}${Math.max(5, 25 - i * 6)}`, animation: `spin ${25 + i * 8}s linear infinite`, animationDirection: i % 2 === 0 ? 'reverse' : 'normal' }} />
         ))}
       </div>
 
