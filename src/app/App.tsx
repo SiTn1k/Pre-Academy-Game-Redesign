@@ -160,13 +160,146 @@ const TASKS = [
   { id: 3, icon: "📦", name: "Відкрий артефакт",      progress: 1,   target: 1,   reward: "1 000 🪙", claimed: true  },
 ];
 
-const ARTIFACTS = [
-  { name: "Козацька шабля",   icon: "⚔️", rarity: "Legendary", level: 3, bonus: "XP ×2.5"    },
-  { name: "Бунчук гетьмана",  icon: "🏳️", rarity: "Epic",      level: 2, bonus: "Пасив ×1.8"  },
-  { name: "Люлька кошового",  icon: "🪬", rarity: "Rare",      level: 4, bonus: "Монет ×1.4"  },
-  { name: "Сагайдак та лук",  icon: "🏹", rarity: "Common",    level: 1, bonus: "XP ×1.2"    },
-  { name: "Порохівниця",      icon: "💣", rarity: "Rare",      level: 2, bonus: "Монет ×1.3"  },
-  { name: "Козацький барабан",icon: "🥁", rarity: "Epic",      level: 1, bonus: "Пасив ×1.5"  },
+// ─── Epoch Artifacts ────────────────────────────────────────────────────────────
+
+interface Artifact {
+  id: number;
+  name: string;
+  icon: string;
+  rarity: "Common" | "Rare" | "Epic" | "Legendary" | "Mythic";
+  level: number;
+  bonus: string;
+  description: string;
+  premiumOnly?: boolean; // Telegram Stars exclusive
+}
+
+const RARITY_COLORS: Record<string, string> = {
+  Common: "#9CA3AF",
+  Rare: "#3B82F6",
+  Epic: "#A855F7",
+  Legendary: "#F59E0B",
+  Mythic: "#EF4444",
+};
+
+const RARITY_BONUSES: Record<string, string[]> = {
+  Common: ["XP ×1.1", "XP ×1.2", "Монет ×1.1"],
+  Rare: ["XP ×1.3", "XP ×1.4", "Монет ×1.3", "Пасив ×1.2"],
+  Epic: ["XP ×1.8", "XP ×2.0", "Пасив ×1.5", "Пасив ×1.8"],
+  Legendary: ["XP ×2.5", "XP ×3.0", "Пасив ×2.0", "Шанс ×1.5"],
+  Mythic: ["XP ×4.0", "Генератори ×1.5", "Пасив ×3.0", "Шанс ×2.0"],
+};
+
+// Artifacts for each epoch
+const EPOCH_ARTIFACTS: Record<number, Artifact[]> = {
+  // 1. Трипільська культура
+  1: [
+    { id: 1, name: "Глиняний глечик", icon: "🏺", rarity: "Common", level: 1, bonus: "XP ×1.1", description: "Ритуальний посуд трипільських майстрів" },
+    { id: 2, name: "Статуетка богині", icon: "🕯️", rarity: "Rare", level: 2, bonus: "XP ×1.3", description: "Символ родючості та материнства" },
+    { id: 3, name: "Кам'яна сокира", icon: "🪓", rarity: "Epic", level: 3, bonus: "Пасив ×1.5", description: "Перший інструмент цивілізації" },
+    { id: 4, name: "Орнамент Трипілля", icon: "🔮", rarity: "Legendary", level: 4, bonus: "XP ×2.5", description: "Космічний символ єдності з природою" },
+  ],
+  // 2. Скіфія
+  2: [
+    { id: 1, name: "Скіфський меч", icon: "⚔️", rarity: "Common", level: 1, bonus: "XP ×1.2", description: "Клинок степових воїнів" },
+    { id: 2, name: "Золота пектораль", icon: "🏅", rarity: "Rare", level: 2, bonus: "XP ×1.4", description: "Нагрудна прикраса царів" },
+    { id: 3, name: "Акінак", icon: "🗡️", rarity: "Epic", level: 3, bonus: "Пасив ×1.6", description: "Легендарний короткий меч" },
+    { id: 4, name: "Скіфське золото", icon: "💰", rarity: "Legendary", level: 4, bonus: "Монет ×2.0", description: "Скарби курганів" },
+  ],
+  // 3. Сарматія
+  3: [
+    { id: 1, name: "Сарматський лук", icon: "🏹", rarity: "Common", level: 1, bonus: "XP ×1.1", description: "Воїни-лучники степів" },
+    { id: 2, name: "Панцир воїна", icon: "🛡️", rarity: "Rare", level: 2, bonus: "XP ×1.3", description: "Захист вершників" },
+    { id: 3, name: "Амазонка", icon: "⚔️", rarity: "Epic", level: 3, bonus: "Пасив ×1.5", description: "Жінки-воїни Сарматії" },
+    { id: 4, name: "Золота діадема", icon: "👑", rarity: "Legendary", level: 4, bonus: "XP ×2.5", description: "Символ влади царів" },
+  ],
+  // 4. Античні міста
+  4: [
+    { id: 1, name: "Грецька амфора", icon: "🏺", rarity: "Common", level: 1, bonus: "XP ×1.1", description: "Посуд для вина та олії" },
+    { id: 2, name: "Оракул", icon: "🔮", rarity: "Rare", level: 2, bonus: "XP ×1.4", description: "Провісник долі" },
+    { id: 3, name: "Афіна Парфенос", icon: "🏛️", rarity: "Epic", level: 3, bonus: "Пасив ×1.6", description: "Статуя богині мудрості" },
+    { id: 4, name: "Золота монета", icon: "🪙", rarity: "Legendary", level: 4, bonus: "Монет ×2.0", description: "Валюта античних міст" },
+  ],
+  // 5. Київська Русь
+  5: [
+    { id: 1, name: "Срібна гривня", icon: "🪙", rarity: "Common", level: 1, bonus: "XP ×1.1", description: "Середньовічна валюта" },
+    { id: 2, name: "Меч дружинника", icon: "⚔️", rarity: "Rare", level: 2, bonus: "XP ×1.4", description: "Зброя князівської охорони" },
+    { id: 3, name: "Київська мозаїка", icon: "✨", rarity: "Epic", level: 3, bonus: "Пасив ×1.6", description: "Софія Київська" },
+    { id: 4, name: "Тризуб Володимира", icon: "🔱", rarity: "Legendary", level: 4, bonus: "XP ×2.5", description: "Символ держави русинів" },
+  ],
+  // 6. Галицько-Волинське князівство
+  6: [
+    { id: 1, name: "Литовський хрест", icon: "✝️", rarity: "Common", level: 1, bonus: "XP ×1.1", description: "Християнський символ" },
+    { id: 2, name: "Золота корона", icon: "👑", rarity: "Rare", level: 2, bonus: "XP ×1.4", description: "Королівська регалія" },
+    { id: 3, name: "Печатка Данила", icon: "📜", rarity: "Epic", level: 3, bonus: "Пасив ×1.6", description: "Першого короля Русі" },
+    { id: 4, name: "Документ про віру", icon: "📜", rarity: "Legendary", level: 4, bonus: "XP ×2.5", description: "Королівство Русь" },
+  ],
+  // 7. Козацька доба
+  7: [
+    { id: 1, name: "Козацька шабля", icon: "⚔️", rarity: "Common", level: 1, bonus: "XP ×1.1", description: "Зброя вільних воїнів" },
+    { id: 2, name: "Бунчук", icon: "🏳️", rarity: "Rare", level: 2, bonus: "XP ×1.4", description: "Символ козацької влади" },
+    { id: 3, name: "Люлька кошового", icon: "🪬", rarity: "Epic", level: 3, bonus: "Пасив ×1.6", description: "Атрибут козацької старшини" },
+    { id: 4, name: "Булава гетьмана", icon: "🔨", rarity: "Legendary", level: 4, bonus: "XP ×2.5", description: "Символ гетьманської влади" },
+    { id: 5, name: "Червона книга", icon: "📕", rarity: "Mythic", level: 5, bonus: "XP ×4.0", description: "Реєстр козацької старшини" },
+  ],
+  // 8. Кримське ханство
+  8: [
+    { id: 1, name: "Кримська люлька", icon: "🪬", rarity: "Common", level: 1, bonus: "XP ×1.1", description: "Традиційний калян" },
+    { id: 2, name: "Ялтинський палац", icon: "🏛️", rarity: "Rare", level: 2, bonus: "XP ×1.4", description: "Резиденція ханів" },
+    { id: 3, name: "Бурштиновий шлях", icon: "💎", rarity: "Epic", level: 3, bonus: "Пасив ×1.6", description: "Торговий шлях бурштину" },
+    { id: 4, name: "Ханська печать", icon: "🏅", rarity: "Legendary", level: 4, bonus: "Монет ×2.0", description: "Символ ханської влади" },
+  ],
+  // 9. Гетьманщина
+  9: [
+    { id: 1, name: "Козацький барабан", icon: "🥁", rarity: "Common", level: 1, bonus: "XP ×1.1", description: "Сигнал до бою" },
+    { id: 2, name: "Порохівниця", icon: "💣", rarity: "Rare", level: 2, bonus: "XP ×1.4", description: "Збірка пороху" },
+    { id: 3, name: "Артилерійський ключ", icon: "🔑", rarity: "Epic", level: 3, bonus: "Пасив ×1.6", description: "Доступ до гармат" },
+    { id: 4, name: "Військова печать", icon: "📜", rarity: "Legendary", level: 4, bonus: "XP ×2.5", description: "Документи Гетьманщини" },
+  ],
+  // 10. Національне відродження
+  10: [
+    { id: 1, name: "Кобзар", icon: "📖", rarity: "Common", level: 1, bonus: "XP ×1.1", description: "Тарас Шевченко" },
+    { id: 2, name: "Казка", icon: "📜", rarity: "Rare", level: 2, bonus: "XP ×1.4", description: "Твори Франка" },
+    { id: 3, name: "Тризуб", icon: "🔱", rarity: "Epic", level: 3, bonus: "Пасив ×1.6", description: "Символ нації" },
+    { id: 4, name: "Прапор УНР", icon: "🏴", rarity: "Legendary", level: 4, bonus: "XP ×2.5", description: "Синьо-жовтий стяг" },
+  ],
+  // 11. УНР
+  11: [
+    { id: 1, name: "Універсал УНР", icon: "📜", rarity: "Common", level: 1, bonus: "XP ×1.1", description: "Документи УНР" },
+    { id: 2, name: "Військовий квиток", icon: "🎖️", rarity: "Rare", level: 2, bonus: "XP ×1.4", description: "Армія УНР" },
+    { id: 3, name: "Перший герб", icon: "🏴", rarity: "Epic", level: 3, bonus: "Пасив ×1.6", description: "Державна символіка" },
+    { id: 4, name: "Акт Злуки", icon: "📜", rarity: "Legendary", level: 4, bonus: "XP ×2.5", description: "Об'єднання УНР та ЗУНР" },
+  ],
+  // 12. Незалежна Україна
+  12: [
+    { id: 1, name: "Конституція 1996", icon: "📋", rarity: "Common", level: 1, bonus: "XP ×1.1", description: "Основний закон держави" },
+    { id: 2, name: "Перша гривня", icon: "₴", rarity: "Rare", level: 2, bonus: "XP ×1.4", description: "Національна валюта" },
+    { id: 3, name: "Пам'ятна монета", icon: "🪙", rarity: "Epic", level: 3, bonus: "Пасив ×1.6", description: "Номінал 1996" },
+    { id: 4, name: "Державний прапор", icon: "🇺🇦", rarity: "Legendary", level: 4, bonus: "XP ×2.5", description: "Символ незалежності" },
+  ],
+};
+
+function getArtifacts(epochIndex: number): Artifact[] {
+  return EPOCH_ARTIFACTS[epochIndex + 1] || EPOCH_ARTIFACTS[7];
+}
+
+function getRarityColor(rarity: string): string {
+  return RARITY_COLORS[rarity] || "#9CA3AF";
+}
+
+// ─── Premium Artifacts (Telegram Stars) ───────────────────────────────────────
+
+const PREMIUM_ARTIFACTS: Artifact[] = [
+  // Tripilia
+  { id: 1001, name: "Космічне яйце", icon: "🥚", rarity: "Mythic", level: 5, bonus: "Генератори ×1.5", description: "Символ первісного хаосу", premiumOnly: true },
+  // Scythia
+  { id: 2001, name: "Золота пектораль Товстої Могили", icon: "🏅", rarity: "Mythic", level: 5, bonus: "XP ×4.0", description: "Найбільший скарб скіфів", premiumOnly: true },
+  // Rus
+  { id: 5001, name: "Корона Ярослава", icon: "👑", rarity: "Mythic", level: 5, bonus: "Пасив ×3.0", description: "Символ могутності Києва", premiumOnly: true },
+  // Cossacks
+  { id: 7001, name: "Бунчук кошового", icon: "🏳️", rarity: "Mythic", level: 5, bonus: "Шанс ×2.0", description: "Атрибут найвищої влади", premiumOnly: true },
+  // Modern Ukraine
+  { id: 12001, name: "Bayraktar TB2", icon: "🛩️", rarity: "Mythic", level: 5, bonus: "XP ×4.0", description: "Символ оборони", premiumOnly: true },
+  { id: 12002, name: "Starlink", icon: "🛰️", rarity: "Mythic", level: 5, bonus: "Офлайн ×3.0", description: "Зв'язок через океан", premiumOnly: true },
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -871,27 +1004,45 @@ const RARITY_STYLES: Record<string, string> = {
 };
 
 function ArtifactsTab() {
+  const { state } = useGame();
+  const epoch = useEpoch();
+  const artifacts = getArtifacts(state.currentEpochIndex);
+
   return (
     <div className="h-full flex flex-col">
-      <div className="p-4 border-b border-amber-400/10 flex items-center justify-between shrink-0">
+      <div className="p-4 border-b flex items-center justify-between shrink-0" style={{ borderColor: `${epoch.colors.primary}20` }}>
         <div>
           <div className="text-white/90 font-semibold text-sm" style={{ fontFamily: "'Cinzel', serif" }}>
-            Артефакти
+            Артефакти {epoch.shortName}
           </div>
-          <div className="text-white/35 text-xs mt-0.5">6 з 24 зібрано</div>
+          <div className="text-xs mt-0.5" style={{ color: `${epoch.colors.primary}60` }}>
+            {artifacts.length} унікальних артефактів епохи
+          </div>
         </div>
-        <button className="bg-primary text-primary-foreground text-xs font-bold px-3 py-2 rounded-xl active:scale-95 transition-transform">
-          📦 Відкрити (500 🪙)
+        <button 
+          className="text-xs font-bold px-3 py-2 rounded-xl active:scale-95 transition-transform"
+          style={{ backgroundColor: epoch.colors.primary, color: epoch.colors.background }}
+        >
+          📦 Відкрити (500 {epoch.currencyIcon})
         </button>
       </div>
       <div className="flex-1 overflow-y-auto p-3">
         <div className="grid grid-cols-2 gap-2.5">
-          {ARTIFACTS.map((a, i) => (
-            <div key={i} className={`p-3 rounded-2xl border ${RARITY_STYLES[a.rarity]}`}>
+          {artifacts.map((a, i) => (
+            <div 
+              key={i} 
+              className="p-3 rounded-2xl border"
+              style={{ 
+                backgroundColor: `${getRarityColor(a.rarity)}10`,
+                borderColor: `${getRarityColor(a.rarity)}40`,
+              }}
+            >
               <div className="text-2xl mb-2">{a.icon}</div>
               <div className="text-[11px] font-semibold text-white/90 leading-tight mb-1">{a.name}</div>
-              <div className="text-[9px] opacity-50 mb-1.5 uppercase tracking-wide">{a.rarity} · Lv.{a.level}</div>
-              <div className="text-[11px] font-bold">{a.bonus}</div>
+              <div className="text-[9px] mb-1.5 uppercase tracking-wide" style={{ color: getRarityColor(a.rarity) }}>
+                {a.rarity} · Lv.{a.level}
+              </div>
+              <div className="text-[11px] font-bold" style={{ color: epoch.colors.success }}>{a.bonus}</div>
             </div>
           ))}
         </div>
