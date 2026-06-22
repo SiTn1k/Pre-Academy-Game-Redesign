@@ -342,85 +342,150 @@ function TapMedallion({ onTap, tapPower }: { onTap: () => void; tapPower: number
   };
 
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-0">
-      {/* Outer pulse rings */}
-      <div 
-        className="absolute w-56 h-56 rounded-full border animate-ping"
-        style={{ borderColor: `${epoch.colors.primary}20`, animationDuration: "3.2s" }} 
-      />
-      <div 
-        className="absolute w-48 h-48 rounded-full border animate-ping"
-        style={{ borderColor: `${epoch.colors.primary}30`, animationDuration: "2.4s", animationDelay: "0.8s" }} 
-      />
-
-      {/* Tick marks on decorative ring */}
-      <div 
-        className="absolute w-[10.5rem] h-[10.5rem] rounded-full border"
-        style={{ borderColor: `${epoch.colors.primary}40` }}
-      >
-        {[0,45,90,135,180,225,270,315].map(deg => (
-          <div
-            key={deg}
-            className="absolute inset-0 flex justify-center"
-            style={{ transform: `rotate(${deg}deg)` }}
+    <div className="absolute inset-0 flex flex-col items-center justify-center">
+      {/* Museum exhibit container - perfectly centered */}
+      <div className="flex flex-col items-center">
+        
+        {/* Concentric sacred circles - museum pedestal effect */}
+        <div className="relative flex items-center justify-center">
+          {/* Outermost circle */}
+          <div 
+            className="absolute rounded-full border animate-pulse"
+            style={{ 
+              width: '280px', 
+              height: '280px', 
+              borderColor: `${epoch.colors.primary}12`,
+              animationDuration: '4s',
+            }} 
+          />
+          {/* Second circle */}
+          <div 
+            className="absolute rounded-full border"
+            style={{ 
+              width: '240px', 
+              height: '240px', 
+              borderColor: `${epoch.colors.primary}18`,
+              animation: 'spin 60s linear infinite',
+            }} 
+          />
+          {/* Third circle */}
+          <div 
+            className="absolute rounded-full border"
+            style={{ 
+              width: '200px', 
+              height: '200px', 
+              borderColor: `${epoch.colors.primary}25`,
+              animation: 'spin 45s linear infinite reverse',
+            }} 
+          />
+          {/* Fourth circle - inner */}
+          <div 
+            className="absolute rounded-full border"
+            style={{ 
+              width: '160px', 
+              height: '160px', 
+              borderColor: `${epoch.colors.primary}35`,
+              animation: 'spin 30s linear infinite',
+            }} 
+          />
+          
+          {/* Golden glow halo behind artifact */}
+          <div 
+            className="absolute w-32 h-32 rounded-full blur-3xl"
+            style={{ 
+              backgroundColor: `${epoch.colors.primary}25`,
+              boxShadow: `0 0 80px 20px ${epoch.colors.primary}15`,
+            }} 
+          />
+          
+          {/* Main artifact button */}
+          <motion.button
+            animate={{ scale: pressing ? 0.92 : 1 }}
+            transition={{ duration: 0.1, ease: "easeOut" }}
+            className="relative w-28 h-28 rounded-full flex flex-col items-center justify-center cursor-pointer z-10"
+            style={{
+              background: `radial-gradient(circle at 30% 30%, ${epoch.colors.primary}40, ${epoch.colors.background} 70%)`,
+              border: `3px solid ${epoch.colors.primary}80`,
+              boxShadow: `
+                0 0 60px ${epoch.colors.primary}30,
+                0 0 100px ${epoch.colors.primary}15,
+                inset 0 2px 20px ${epoch.colors.primary}20,
+                inset 0 -4px 10px rgba(0,0,0,0.5)
+              `,
+            }}
+            onTouchStart={e => { setPressing(true); fire(e); }}
+            onTouchEnd={() => setPressing(false)}
+            onMouseDown={e => { setPressing(true); fire(e); }}
+            onMouseUp={() => setPressing(false)}
+            onMouseLeave={() => setPressing(false)}
           >
-            <div className="w-px h-2 rounded-full" style={{ backgroundColor: `${epoch.colors.primary}60` }} />
-          </div>
-        ))}
-      </div>
-
-      {/* Ambient glow */}
-      <div 
-        className="absolute w-36 h-36 rounded-full blur-2xl" 
-        style={{ backgroundColor: `${epoch.colors.primary}15` }} 
-      />
-
-      {/* Main button */}
-      <motion.button
-        animate={{ scale: pressing ? 0.90 : 1 }}
-        transition={{ duration: 0.09, ease: "easeOut" }}
-        className="relative w-32 h-32 rounded-full flex flex-col items-center justify-center cursor-pointer"
-        style={{
-          background: `linear-gradient(to bottom, ${epoch.colors.primary}30, ${epoch.colors.background})`,
-          border: `2px solid ${epoch.colors.primary}60`,
-          boxShadow: `0 0 48px ${epoch.colors.primary}20,inset 0 1px 4px rgba(255,255,255,0.1),inset 0 -2px 6px rgba(0,0,0,0.5)`,
-        }}
-        onTouchStart={e => { setPressing(true); fire(e); }}
-        onTouchEnd={() => setPressing(false)}
-        onMouseDown={e => { setPressing(true); fire(e); }}
-        onMouseUp={() => setPressing(false)}
-        onMouseLeave={() => setPressing(false)}
-      >
-        {/* Inner ring */}
-        <div className="absolute inset-2.5 rounded-full border" style={{ borderColor: `${epoch.colors.primary}25` }} />
-        {/* Icon */}
-        <span className="text-5xl select-none relative z-10 -mt-1">{epoch.icon}</span>
-        <span 
-          className="text-[9px] uppercase tracking-[3px] mt-0.5 relative z-10 select-none"
-          style={{ color: `${epoch.colors.primary}80` }}
-        >
-          Натисни
-        </span>
-      </motion.button>
-
-      {/* Tap power badge */}
-      <div className="mt-4">
-        <div 
-          className="border rounded-full px-3 py-1 flex items-center gap-1.5"
-          style={{ backgroundColor: `${epoch.colors.background}f0`, borderColor: `${epoch.colors.primary}30` }}
-        >
-          <span className="text-xs" style={{ color: epoch.colors.primary }}>⚡</span>
-          <span
-            className="text-[11px] font-bold"
-            style={{ fontFamily: "'DM Mono', monospace", color: epoch.colors.primary }}
-          >
-            +{tapPower} XP
-          </span>
+            {/* Inner decorative ring */}
+            <div 
+              className="absolute inset-3 rounded-full border"
+              style={{ borderColor: `${epoch.colors.primary}30` }} 
+            />
+            {/* Artifact icon */}
+            <span className="text-6xl select-none relative z-10">{epoch.icon}</span>
+          </motion.button>
         </div>
+
+        {/* Artifact name - museum plaque style */}
+        <div className="mt-8 text-center">
+          <h2 
+            className="text-lg font-bold uppercase"
+            style={{ 
+              fontFamily: "'Cinzel', serif",
+              color: epoch.colors.primary,
+              textShadow: `0 0 20px ${epoch.colors.primary}40`,
+              letterSpacing: '0.5em',
+            }}
+          >
+            НАМІСТИ
+          </h2>
+          {/* Decorative line under name */}
+          <div className="flex items-center justify-center gap-3 mt-2">
+            <div className="h-px w-12" style={{ backgroundColor: `${epoch.colors.primary}40` }} />
+            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: epoch.colors.primary }} />
+            <div className="h-px w-12" style={{ backgroundColor: `${epoch.colors.primary}40` }} />
+          </div>
+        </div>
+
+        {/* Reward button - museum display info */}
+        <div className="mt-6">
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            className="px-6 py-2.5 rounded-full font-semibold text-sm flex items-center gap-2"
+            style={{
+              background: `linear-gradient(135deg, ${epoch.colors.primary}30, ${epoch.colors.primary}15)`,
+              border: `1px solid ${epoch.colors.primary}50`,
+              color: epoch.colors.primary,
+              boxShadow: `0 0 20px ${epoch.colors.primary}20`,
+              fontFamily: "'Cinzel', serif",
+              letterSpacing: '0.1em',
+            }}
+            onClick={fire}
+          >
+            <span className="text-lg">⚡</span>
+            <span>+{tapPower} XP</span>
+          </motion.button>
+        </div>
+        
+        {/* Subtle instruction */}
+        <p 
+          className="mt-4 text-[10px] uppercase"
+          style={{ 
+            color: `${epoch.colors.primary}50`,
+            fontFamily: "'Cinzel', serif",
+            letterSpacing: '0.3em',
+          }}
+        >
+          Торкніться експоната
+        </p>
       </div>
     </div>
   );
 }
+
 
 // ─── Atmospheric Game Canvas ──────────────────────────────────────────────────
 
