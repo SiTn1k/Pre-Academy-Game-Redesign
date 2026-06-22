@@ -1003,6 +1003,109 @@ const RARITY_STYLES: Record<string, string> = {
   Common:    "border-white/10 bg-white/5 text-white/50",
 };
 
+// ─── Artifact Reveal Modal ─────────────────────────────────────────────────────
+
+function ArtifactRevealModal({ artifact, epoch, onClose }: { artifact: Artifact; epoch: Epoch; onClose: () => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: "rgba(0,0,0,0.85)" }}
+    >
+      <motion.div
+        initial={{ scale: 0, y: 50 }}
+        animate={{ scale: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
+        className="relative w-full max-w-sm rounded-3xl border-2 p-6 text-center"
+        style={{
+          backgroundColor: `${epoch.colors.background}f0`,
+          borderColor: getRarityColor(artifact.rarity),
+          boxShadow: `0 0 60px ${getRarityColor(artifact.rarity)}40`,
+        }}
+      >
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold uppercase" style={{ backgroundColor: getRarityColor(artifact.rarity), color: "#000" }}>
+          {artifact.rarity}
+        </div>
+        <div className="text-7xl my-6">{artifact.icon}</div>
+        <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "'Cinzel', serif" }}>{artifact.name}</h3>
+        <div className="text-sm mb-4" style={{ color: `${epoch.colors.primary}80` }}>{epoch.name}</div>
+        <p className="text-sm text-white/60 italic mb-4">"{artifact.description}"</p>
+        <div className="px-4 py-2 rounded-xl mb-6" style={{ backgroundColor: `${epoch.colors.success}20`, color: epoch.colors.success }}>
+          <span className="font-bold">{artifact.bonus}</span>
+        </div>
+        <button onClick={onClose} className="w-full py-3 rounded-xl font-bold" style={{ backgroundColor: epoch.colors.primary, color: epoch.colors.background }}>
+          Зібрати
+        </button>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// ─── Artifact Opening Modal ───────────────────────────────────────────────────
+
+function ArtifactOpeningModal({ epoch, onClose, onReveal }: { epoch: Epoch; onClose: () => void; onReveal: (a: Artifact) => void }) {
+  const { state } = useGame();
+  const [adTimer, setAdTimer] = useState(0);
+
+  React.useEffect(() => {
+    if (adTimer > 0) {
+      const interval = setInterval(() => setAdTimer(t => Math.max(0, t - 1)), 1000);
+      return () => clearInterval(interval);
+    }
+  }, [adTimer]);
+
+  const handleNormalOpen = () => {
+    if (state.currency < 500) return;
+    const artifacts = getArtifacts(state.currentEpochIndex);
+    const randomArtifact = artifacts[Math.floor(Math.random() * artifacts.length)];
+    onReveal(randomArtifact);
+  };
+
+  const handleAdOpen = () => {
+    if (adTimer > 0) return;
+    setAdTimer(300);
+    const artifacts = getArtifacts(state.currentEpochIndex);
+    const randomArtifact = artifacts[Math.floor(Math.random() * artifacts.length)];
+    onReveal(randomArtifact);
+  };
+
+  const handleStarsOpen = () => {
+    const randomArtifact = PREMIUM_ARTIFACTS[Math.floor(Math.random() * PREMIUM_ARTIFACTS.length)];
+    onReveal(randomArtifact);
+  };
+
+  const formatTime = (seconds: number) => `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: "rgba(0,0,0,0.85)" }} onClick={onClose}>
+      <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} className="w-full max-w-sm rounded-3xl border p-6" style={{ backgroundColor: `${epoch.colors.background}f0`, borderColor: `${epoch.colors.primary}40` }} onClick={e => e.stopPropagation()}>
+        <h3 className="text-lg font-bold text-center mb-6" style={{ fontFamily: "'Cinzel', serif", color: epoch.colors.primary }}>📦 Відкриття артефакту</h3>
+        <button onClick={handleNormalOpen} disabled={state.currency < 500} className="w-full p-4 rounded-2xl border mb-3" style={{ backgroundColor: state.currency >= 500 ? `${epoch.colors.primary}15` : `${epoch.colors.primary}05`, borderColor: state.currency >= 500 ? epoch.colors.primary : `${epoch.colors.primary}30`, opacity: state.currency >= 500 ? 1 : 0.5 }}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3"><span className="text-2xl">🪙</span><div className="text-left"><div className="text-white/90 font-semibold">Відкрити за монети</div><div className="text-white/40 text-xs">Витратити 500 монет</div></div></div>
+            <span className="font-bold" style={{ color: epoch.colors.primary }}>500</span>
+          </div>
+        </button>
+        <button onClick={handleAdOpen} disabled={adTimer > 0} className="w-full p-4 rounded-2xl border mb-3" style={{ backgroundColor: adTimer > 0 ? `${epoch.colors.accent}05` : `${epoch.colors.accent}15`, borderColor: adTimer > 0 ? `${epoch.colors.accent}30` : epoch.colors.accent, opacity: adTimer > 0 ? 0.5 : 1 }}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3"><span className="text-2xl">📺</span><div className="text-left"><div className="text-white/90 font-semibold">Відкрити за рекламу</div><div className="text-white/40 text-xs">{adTimer > 0 ? `Наступне через ${formatTime(adTimer)}` : "Безкоштовно"}</div></div></div>
+            <span className="font-bold" style={{ color: epoch.colors.accent }}>{adTimer > 0 ? formatTime(adTimer) : "FREE"}</span>
+          </div>
+        </button>
+        <button onClick={handleStarsOpen} className="w-full p-4 rounded-2xl border mb-4" style={{ backgroundColor: "#FFF7ED", borderColor: "#FCD34D" }}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3"><span className="text-2xl">⭐</span><div className="text-left"><div className="text-orange-800 font-semibold">Premium відкриття</div><div className="text-orange-600/60 text-xs">Guaranteed Epic or higher</div></div></div>
+            <span className="font-bold text-orange-600">15 Stars</span>
+          </div>
+        </button>
+        <button onClick={onClose} className="w-full py-2 text-white/50 text-sm">Скасувати</button>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 function ArtifactsTab() {
   const { state } = useGame();
   const epoch = useEpoch();
