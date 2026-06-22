@@ -875,29 +875,14 @@ function TapPage() {
       className="h-screen w-screen overflow-hidden select-none bg-background text-foreground"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
-      {/* Minimal header */}
-      <div className="absolute top-0 left-0 right-0 z-10 px-4 pt-2 flex items-center justify-between"
-           style={{ paddingTop: "env(safe-area-inset-top)" }}>
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-lg">
-            {EPOCH.icon}
-          </div>
-          <div>
-            <div className="text-amber-300 text-xs font-semibold" style={{ fontFamily: "'Cinzel', serif" }}>
-              {EPOCH.name}
-            </div>
-            <div className="text-amber-400/40 text-[10px]">Lv.{state.level}</div>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="text-right">
-            <div className="text-[9px] text-white/30">🪙</div>
-            <div className="text-amber-300 text-xs font-bold" style={{ fontFamily: "'DM Mono', monospace" }}>
-              {fmt(state.currency)}
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Full header */}
+      <Header
+        level={state.level}
+        xp={state.xp}
+        xpToNext={state.xpToNext}
+        currency={state.currency}
+        passivePerSec={state.passivePerSec}
+      />
 
       {/* Full screen game canvas */}
       <div className="w-full h-full">
