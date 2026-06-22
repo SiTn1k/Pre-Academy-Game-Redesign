@@ -11,15 +11,44 @@ interface TapEvent {
   value: number;
 }
 
-// ─── Game Data (demo) ─────────────────────────────────────────────────────────
+// ─── Epochs of Ukrainian History ───────────────────────────────────────────────
 
-const EPOCH = {
-  name: "Козацька доба",
-  period: "XVI–XVII ст.",
-  icon: "🏇",
-  currencyIcon: "🪙",
-  currencyName: "Дукати",
-};
+interface Epoch {
+  id: number;
+  name: string;
+  shortName: string;
+  period: string;
+  icon: string;
+  currencyIcon: string;
+  currencyName: string;
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    background: string;
+    textPrimary: string;
+    border: string;
+    success: string;
+  };
+}
+
+export const EPOCHS: Epoch[] = [
+  { id: 1, name: "Трипільська культура", shortName: "Трипілля", period: "4500-2700 до н.е.", icon: "🏺", currencyIcon: "🏺", currencyName: "Глиняні мірky", colors: { primary: "#C4783C", secondary: "#8B5E34", accent: "#E8A857", background: "#1A1209", textPrimary: "#E8A857", border: "rgba(232, 168, 87, 0.2)", success: "#8BC34A" } },
+  { id: 2, name: "Скіфія", shortName: "Скіфи", period: "VII-III ст. до н.е.", icon: "⚔️", currencyIcon: "🪙", currencyName: "Скіфські солиди", colors: { primary: "#D4AF37", secondary: "#8B6914", accent: "#FFD700", background: "#0D0D0D", textPrimary: "#FFD700", border: "rgba(255, 215, 0, 0.2)", success: "#90EE90" } },
+  { id: 3, name: "Сарматія", shortName: "Сармати", period: "III ст. до н.е. - IV ст. н.е.", icon: "🏇", currencyIcon: "💎", currencyName: "Бурштин", colors: { primary: "#6B8E9F", secondary: "#4A6670", accent: "#9FCDDF", background: "#0A1520", textPrimary: "#9FCDDF", border: "rgba(159, 205, 223, 0.2)", success: "#7CFC00" } },
+  { id: 4, name: "Античні міста", shortName: "Елліни", period: "VI ст. до н.е. - IV ст. н.е.", icon: "🏛️", currencyIcon: "🪼", currencyName: "Драхми", colors: { primary: "#4A90A4", secondary: "#2E5A6B", accent: "#7EC8E3", background: "#0D1520", textPrimary: "#7EC8E3", border: "rgba(126, 200, 227, 0.2)", success: "#40E0D0" } },
+  { id: 5, name: "Київська Русь", shortName: "Русь", period: "IX-XIII ст.", icon: "⛪", currencyIcon: "🪙", currencyName: "Гривні", colors: { primary: "#4A90D9", secondary: "#1E3A5F", accent: "#6BB3F0", background: "#050A10", textPrimary: "#4A90D9", border: "rgba(74, 144, 217, 0.2)", success: "#4169E1" } },
+  { id: 6, name: "Галицько-Волинське князівство", shortName: "Галичина", period: "XIV-XIV ст.", icon: "🦁", currencyIcon: "🪙", currencyName: "Практи", colors: { primary: "#DC143C", secondary: "#8B0000", accent: "#FF4444", background: "#0F0505", textPrimary: "#DC143C", border: "rgba(220, 20, 60, 0.2)", success: "#228B22" } },
+  { id: 7, name: "Козацька доба", shortName: "Козаки", period: "XVI-XVII ст.", icon: "🏇", currencyIcon: "🪙", currencyName: "Дукати", colors: { primary: "#F5C842", secondary: "#B8860B", accent: "#FFD700", background: "#07090F", textPrimary: "#F5C842", border: "rgba(245, 200, 66, 0.2)", success: "#32CD32" } },
+  { id: 8, name: "Кримське ханство", shortName: "Крим", period: "XV-XVIII ст.", icon: "🕌", currencyIcon: "💰", currencyName: "Аспри", colors: { primary: "#40E0D0", secondary: "#00CED1", accent: "#00FFFF", background: "#031515", textPrimary: "#40E0D0", border: "rgba(64, 224, 208, 0.2)", success: "#2E8B57" } },
+  { id: 9, name: "Українська козацька держава", shortName: "Гетьманщина", period: "XVII-XVIII ст.", icon: "⚜️", currencyIcon: "🪙", currencyName: "Рейтарські златії", colors: { primary: "#9370DB", secondary: "#6A5ACD", accent: "#BA55D3", background: "#050510", textPrimary: "#9370DB", border: "rgba(106, 90, 205, 0.2)", success: "#9370DB" } },
+  { id: 10, name: "Національне відродження", shortName: "Відродження", period: "XIX ст.", icon: "🔱", currencyIcon: "💰", currencyName: "Карбованці", colors: { primary: "#32CD32", secondary: "#228B22", accent: "#00FF00", background: "#031003", textPrimary: "#32CD32", border: "rgba(50, 205, 50, 0.2)", success: "#FFD700" } },
+  { id: 11, name: "УНР та модернізація", shortName: "УНР", period: "1918-1940", icon: "🇺🇦", currencyIcon: "💴", currencyName: "Українські карбованці", colors: { primary: "#FFD700", secondary: "#005BBB", accent: "#005BBB", background: "#030810", textPrimary: "#FFD700", border: "rgba(0, 91, 187, 0.2)", success: "#005BBB" } },
+  { id: 12, name: "Незалежна Україна", shortName: "Незалежність", period: "1991-дотепер", icon: "🇺🇦", currencyIcon: "₴", currencyName: "Гривні", colors: { primary: "#FFD700", secondary: "#005BBB", accent: "#005BBB", background: "#040810", textPrimary: "#FFD700", border: "rgba(0, 91, 187, 0.25)", success: "#228B22" } },
+];
+
+// Current epoch (default - index 6 = Cossack era)
+const EPOCH = EPOCHS[6];
 
 const GENERATORS = [
   { id: 1, name: "Козацький табір", icon: "⛺", level: 8,  production: 12,  cost: 24_000,  canBuyAt: 24_000  },
