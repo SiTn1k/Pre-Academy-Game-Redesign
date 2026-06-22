@@ -87,7 +87,8 @@ function fmtTime(minutes: number): string {
 
 // ─── SVG Decorations ─────────────────────────────────────────────────────────
 
-function CornerOrnament({ flipX, flipY }: { flipX?: boolean; flipY?: boolean }) {
+function CornerOrnament({ flipX, flipY, epoch }: { flipX?: boolean; flipY?: boolean; epoch?: Epoch }) {
+  const color = epoch?.colors.primary || "#F5C842";
   return (
     <svg
       viewBox="0 0 44 44"
@@ -95,21 +96,22 @@ function CornerOrnament({ flipX, flipY }: { flipX?: boolean; flipY?: boolean }) 
       className="w-11 h-11"
       style={{ transform: `scale(${flipX ? -1 : 1}, ${flipY ? -1 : 1})` }}
     >
-      <path d="M4 40 L4 4 L40 4" stroke="#F5C842" strokeWidth="1.5" strokeLinecap="round" opacity="0.35" />
-      <path d="M4 4 Q22 4 22 22" stroke="#F5C842" strokeWidth="0.7" strokeDasharray="2.5 2.5" opacity="0.2" />
-      <circle cx="4"  cy="4"  r="2.5" fill="#F5C842" opacity="0.5" />
-      <circle cx="4"  cy="40" r="1.5" fill="#F5C842" opacity="0.25" />
-      <circle cx="40" cy="4"  r="1.5" fill="#F5C842" opacity="0.25" />
+      <path d="M4 40 L4 4 L40 4" stroke={color} strokeWidth="1.5" strokeLinecap="round" opacity="0.35" />
+      <path d="M4 4 Q22 4 22 22" stroke={color} strokeWidth="0.7" strokeDasharray="2.5 2.5" opacity="0.2" />
+      <circle cx="4"  cy="4"  r="2.5" fill={color} opacity="0.5" />
+      <circle cx="4"  cy="40" r="1.5" fill={color} opacity="0.25" />
+      <circle cx="40" cy="4"  r="1.5" fill={color} opacity="0.25" />
     </svg>
   );
 }
 
-function GridTexture() {
+function GridTexture({ epoch }: { epoch?: Epoch }) {
+  const color = epoch?.colors.primary || "#F5C842";
   return (
     <svg className="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <pattern id="hg" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
-          <path d="M0 0 L28 0 M0 0 L0 28" stroke="#F5C842" strokeWidth="0.3" opacity="0.1" />
+          <path d="M0 0 L28 0 M0 0 L0 28" stroke={color} strokeWidth="0.3" opacity="0.1" />
         </pattern>
       </defs>
       <rect width="100%" height="100%" fill="url(#hg)" />
@@ -179,31 +181,70 @@ function IcoLock({ className }: { className?: string }) {
   );
 }
 
+function IcoZap({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+    </svg>
+  );
+}
+
+function IcoTicket({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/>
+      <path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/>
+      <line x1="12" y1="3" x2="12" y2="21"/>
+    </svg>
+  );
+}
+
+function IcoPlay({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="5 3 19 12 5 21 5 3"/>
+    </svg>
+  );
+}
+
 // ─── Header ──────────────────────────────────────────────────────────────────
 
 function Header({ level, xp, xpToNext, currency, passivePerSec }: {
   level: number; xp: number; xpToNext: number; currency: number; passivePerSec: number;
 }) {
+  const epoch = useEpoch();
   const pct = Math.min(100, (xp / xpToNext) * 100);
   return (
-    <div className="shrink-0 bg-[#07090F]/98 backdrop-blur-sm border-b border-amber-400/10"
-         style={{ paddingTop: "env(safe-area-inset-top)" }}>
+    <div 
+      className="shrink-0 backdrop-blur-sm border-b"
+      style={{ 
+        paddingTop: "env(safe-area-inset-top)",
+        backgroundColor: `${epoch.colors.background}e0`,
+        borderColor: epoch.colors.border,
+      }}
+    >
       <div className="px-4 pt-2.5 pb-2">
         {/* Top row */}
         <div className="flex items-center justify-between gap-3 mb-2.5">
           {/* Epoch badge */}
           <div className="flex items-center gap-2 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-amber-400/10 border border-amber-400/20 flex items-center justify-center shrink-0 text-lg">
-              {EPOCH.icon}
+            <div 
+              className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-lg border"
+              style={{ 
+                backgroundColor: `${epoch.colors.primary}15`,
+                borderColor: `${epoch.colors.primary}30`,
+              }}
+            >
+              {epoch.icon}
             </div>
             <div className="min-w-0">
               <div
-                className="text-amber-300 text-xs font-semibold tracking-wide uppercase leading-tight truncate"
-                style={{ fontFamily: "'Cinzel', serif" }}
+                className="text-xs font-semibold tracking-wide uppercase leading-tight truncate"
+                style={{ fontFamily: "'Cinzel', serif", color: epoch.colors.primary }}
               >
-                {EPOCH.name}
+                {epoch.name}
               </div>
-              <div className="text-amber-400/40 text-[10px] leading-tight">{EPOCH.period}</div>
+              <div className="text-[10px] leading-tight" style={{ color: `${epoch.colors.primary}60` }}>{epoch.period}</div>
             </div>
           </div>
 
@@ -212,21 +253,26 @@ function Header({ level, xp, xpToNext, currency, passivePerSec }: {
             {/* Passive */}
             <div className="text-right">
               <div className="text-[9px] text-white/30 leading-none uppercase tracking-wide">Пасив</div>
-              <div className="text-green-400 text-xs font-bold leading-tight" style={{ fontFamily: "'DM Mono', monospace" }}>
+              <div className="text-xs font-bold leading-tight" style={{ fontFamily: "'DM Mono', monospace", color: epoch.colors.success }}>
                 +{fmt(passivePerSec)}/с
               </div>
             </div>
             {/* Currency */}
             <div className="text-right">
-              <div className="text-[9px] text-white/30 leading-none uppercase tracking-wide">{EPOCH.currencyIcon}</div>
-              <div className="text-amber-300 text-xs font-bold leading-tight" style={{ fontFamily: "'DM Mono', monospace" }}>
+              <div className="text-[9px] text-white/30 leading-none uppercase tracking-wide">{epoch.currencyIcon}</div>
+              <div className="text-xs font-bold leading-tight" style={{ fontFamily: "'DM Mono', monospace", color: epoch.colors.primary }}>
                 {fmt(currency)}
               </div>
             </div>
             {/* Level pill */}
             <div
-              className="bg-amber-400 text-[#070A13] font-bold text-sm rounded-xl px-2.5 py-1 min-w-[2.75rem] text-center shadow-[0_0_12px_rgba(245,200,66,0.3)]"
-              style={{ fontFamily: "'Cinzel', serif" }}
+              className="font-bold text-sm rounded-xl px-2.5 py-1 min-w-[2.75rem] text-center"
+              style={{ 
+                fontFamily: "'Cinzel', serif",
+                backgroundColor: epoch.colors.primary,
+                color: epoch.colors.background,
+                boxShadow: `0 0 12px ${epoch.colors.primary}50`,
+              }}
             >
               {level}
             </div>
@@ -238,7 +284,10 @@ function Header({ level, xp, xpToNext, currency, passivePerSec }: {
           <span className="text-[9px] text-white/30 uppercase tracking-widest shrink-0">XP</span>
           <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-amber-500 to-yellow-300"
+              className="h-full rounded-full"
+              style={{ 
+                background: `linear-gradient(to right, ${epoch.colors.primary}, ${epoch.colors.accent})`,
+              }}
               animate={{ width: `${pct}%` }}
               transition={{ duration: 0.35, ease: "easeOut" }}
             />
@@ -284,6 +333,7 @@ function AdBanner({ position }: { position: "top" | "bottom" }) {
 // ─── Tap Medallion ───────────────────────────────────────────────────────────
 
 function TapMedallion({ onTap, tapPower }: { onTap: () => void; tapPower: number }) {
+  const epoch = useEpoch();
   const [pressing, setPressing] = useState(false);
 
   const fire = (e: React.TouchEvent | React.MouseEvent) => {
@@ -294,36 +344,47 @@ function TapMedallion({ onTap, tapPower }: { onTap: () => void; tapPower: number
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center gap-0">
       {/* Outer pulse rings */}
-      <div className="absolute w-56 h-56 rounded-full border border-amber-400/12 animate-ping"
-           style={{ animationDuration: "3.2s" }} />
-      <div className="absolute w-48 h-48 rounded-full border border-amber-400/18 animate-ping"
-           style={{ animationDuration: "2.4s", animationDelay: "0.8s" }} />
+      <div 
+        className="absolute w-56 h-56 rounded-full border animate-ping"
+        style={{ borderColor: `${epoch.colors.primary}20`, animationDuration: "3.2s" }} 
+      />
+      <div 
+        className="absolute w-48 h-48 rounded-full border animate-ping"
+        style={{ borderColor: `${epoch.colors.primary}30`, animationDuration: "2.4s", animationDelay: "0.8s" }} 
+      />
 
       {/* Tick marks on decorative ring */}
-      <div className="absolute w-[10.5rem] h-[10.5rem] rounded-full border border-amber-400/25">
+      <div 
+        className="absolute w-[10.5rem] h-[10.5rem] rounded-full border"
+        style={{ borderColor: `${epoch.colors.primary}40` }}
+      >
         {[0,45,90,135,180,225,270,315].map(deg => (
           <div
             key={deg}
             className="absolute inset-0 flex justify-center"
             style={{ transform: `rotate(${deg}deg)` }}
           >
-            <div className="w-px h-2 bg-amber-400/40 rounded-full" />
+            <div className="w-px h-2 rounded-full" style={{ backgroundColor: `${epoch.colors.primary}60` }} />
           </div>
         ))}
       </div>
 
       {/* Ambient glow */}
-      <div className="absolute w-36 h-36 rounded-full bg-amber-400/8 blur-2xl" />
+      <div 
+        className="absolute w-36 h-36 rounded-full blur-2xl" 
+        style={{ backgroundColor: `${epoch.colors.primary}15` }} 
+      />
 
       {/* Main button */}
       <motion.button
         animate={{ scale: pressing ? 0.90 : 1 }}
         transition={{ duration: 0.09, ease: "easeOut" }}
-        className="relative w-32 h-32 rounded-full flex flex-col items-center justify-center
-          bg-gradient-to-b from-[#1E1A06] to-[#0E0C04]
-          border-2 border-amber-400/40
-          shadow-[0_0_48px_rgba(245,200,66,0.12),inset_0_1px_4px_rgba(255,255,255,0.08),inset_0_-2px_6px_rgba(0,0,0,0.5)]
-          cursor-pointer"
+        className="relative w-32 h-32 rounded-full flex flex-col items-center justify-center cursor-pointer"
+        style={{
+          background: `linear-gradient(to bottom, ${epoch.colors.primary}30, ${epoch.colors.background})`,
+          border: `2px solid ${epoch.colors.primary}60`,
+          boxShadow: `0 0 48px ${epoch.colors.primary}20,inset 0 1px 4px rgba(255,255,255,0.1),inset 0 -2px 6px rgba(0,0,0,0.5)`,
+        }}
         onTouchStart={e => { setPressing(true); fire(e); }}
         onTouchEnd={() => setPressing(false)}
         onMouseDown={e => { setPressing(true); fire(e); }}
@@ -331,21 +392,27 @@ function TapMedallion({ onTap, tapPower }: { onTap: () => void; tapPower: number
         onMouseLeave={() => setPressing(false)}
       >
         {/* Inner ring */}
-        <div className="absolute inset-2.5 rounded-full border border-amber-400/15" />
+        <div className="absolute inset-2.5 rounded-full border" style={{ borderColor: `${epoch.colors.primary}25` }} />
         {/* Icon */}
-        <span className="text-5xl select-none relative z-10 -mt-1">{EPOCH.icon}</span>
-        <span className="text-[9px] text-amber-400/50 uppercase tracking-[3px] mt-0.5 relative z-10 select-none">
+        <span className="text-5xl select-none relative z-10 -mt-1">{epoch.icon}</span>
+        <span 
+          className="text-[9px] uppercase tracking-[3px] mt-0.5 relative z-10 select-none"
+          style={{ color: `${epoch.colors.primary}80` }}
+        >
           Натисни
         </span>
       </motion.button>
 
       {/* Tap power badge */}
       <div className="mt-4">
-        <div className="bg-[#070A13]/90 border border-amber-400/20 rounded-full px-3 py-1 flex items-center gap-1.5">
-          <span className="text-amber-400 text-xs">⚡</span>
+        <div 
+          className="border rounded-full px-3 py-1 flex items-center gap-1.5"
+          style={{ backgroundColor: `${epoch.colors.background}f0`, borderColor: `${epoch.colors.primary}30` }}
+        >
+          <span className="text-xs" style={{ color: epoch.colors.primary }}>⚡</span>
           <span
-            className="text-amber-300 text-[11px] font-bold"
-            style={{ fontFamily: "'DM Mono', monospace" }}
+            className="text-[11px] font-bold"
+            style={{ fontFamily: "'DM Mono', monospace", color: epoch.colors.primary }}
           >
             +{tapPower} XP
           </span>
@@ -362,27 +429,32 @@ function GameCanvas({ onTap, tapEvents, tapPower }: {
   tapEvents: TapEvent[];
   tapPower: number;
 }) {
+  const epoch = useEpoch();
+  
   return (
-    <div className="relative w-full h-full bg-gradient-to-b from-[#0D1E10] via-[#091210] to-[#070A13] overflow-hidden">
-      <GridTexture />
+    <div 
+      className="relative w-full h-full overflow-hidden"
+      style={{ backgroundColor: epoch.colors.background }}
+    >
+      <GridTexture epoch={epoch} />
 
       {/* Radial center glow */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-72 h-72 rounded-full bg-amber-400/5 blur-[60px]" />
+        <div className="w-72 h-72 rounded-full blur-[60px]" style={{ backgroundColor: `${epoch.colors.primary}08` }} />
       </div>
 
       {/* Corner ornaments */}
-      <div className="absolute top-2 left-2 pointer-events-none"><CornerOrnament /></div>
-      <div className="absolute top-2 right-2 pointer-events-none"><CornerOrnament flipX /></div>
-      <div className="absolute bottom-10 left-2 pointer-events-none"><CornerOrnament flipY /></div>
-      <div className="absolute bottom-10 right-2 pointer-events-none"><CornerOrnament flipX flipY /></div>
+      <div className="absolute top-2 left-2 pointer-events-none"><CornerOrnament epoch={epoch} /></div>
+      <div className="absolute top-2 right-2 pointer-events-none"><CornerOrnament epoch={epoch} flipX /></div>
+      <div className="absolute bottom-10 left-2 pointer-events-none"><CornerOrnament epoch={epoch} flipY /></div>
+      <div className="absolute bottom-10 right-2 pointer-events-none"><CornerOrnament epoch={epoch} flipX flipY /></div>
 
       {/* Era label */}
       <div
-        className="absolute top-3 left-1/2 -translate-x-1/2 text-amber-400/20 text-[10px] uppercase tracking-[5px] font-semibold select-none"
-        style={{ fontFamily: "'Cinzel', serif" }}
+        className="absolute top-3 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[5px] font-semibold select-none"
+        style={{ fontFamily: "'Cinzel', serif", color: `${epoch.colors.primary}30` }}
       >
-        {EPOCH.period}
+        {epoch.period}
       </div>
 
       {/* Tap medallion */}
@@ -394,13 +466,14 @@ function GameCanvas({ onTap, tapEvents, tapPower }: {
           <motion.div
             key={ev.id}
             className={`absolute pointer-events-none select-none font-bold ${
-              ev.value >= 100 ? "text-amber-300 text-xl" : "text-yellow-200/90 text-base"
+              ev.value >= 100 ? "text-xl" : "text-base"
             }`}
             style={{
               left: `${ev.xPct}%`,
               top: `${ev.yPct}%`,
               fontFamily: "'DM Mono', monospace",
-              textShadow: "0 0 14px rgba(245,200,66,0.7)",
+              color: ev.value >= 100 ? epoch.colors.primary : epoch.colors.accent,
+              textShadow: `0 0 14px ${epoch.colors.primary}80`,
             }}
             initial={{ opacity: 1, y: 0, scale: 1 }}
             animate={{ opacity: 0, y: -72, scale: ev.value >= 100 ? 1.3 : 1.05 }}
@@ -414,8 +487,8 @@ function GameCanvas({ onTap, tapEvents, tapPower }: {
 
       {/* Bottom ambient labels */}
       <div className="absolute bottom-3 left-4 right-4 flex justify-between pointer-events-none">
-        <span className="text-amber-400/25 text-[10px] font-mono">Рівень 42 / 960</span>
-        <span className="text-amber-400/25 text-[10px] font-mono">#7 у грі</span>
+        <span className="text-[10px] font-mono" style={{ color: `${epoch.colors.primary}40` }}>Рівень 42 / 960</span>
+        <span className="text-[10px] font-mono" style={{ color: `${epoch.colors.primary}40` }}>#7 у грі</span>
       </div>
     </div>
   );
@@ -788,6 +861,7 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   { path: "/tap",        label: "Гра",       Icon: IcoGamepad  },
   { path: "/",           label: "Завдання",  Icon: IcoGem     },
+  { path: "/boosters",   label: "Бустери",   Icon: IcoZap     },
   { path: "/artifacts",  label: "Реліквії",  Icon: IcoGem,    badge: 2 },
   { path: "/profile",    label: "Профіль",   Icon: IcoUser     },
   { path: "/settings",   label: "",          Icon: IcoSettings },
@@ -853,12 +927,15 @@ interface GameState {
   maxEnergy: number;
   dailyStreak: number;
   boosts: { type: string; multiplier: number; minutesLeft: number }[];
+  currentEpochIndex: number;
 }
 
 interface GameContextValue {
   state: GameState;
   tapEvents: TapEvent[];
   handleTap: () => void;
+  setEpoch: (index: number) => void;
+  setState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
 const GameContext = React.createContext<GameContextValue | null>(null);
@@ -869,14 +946,24 @@ function useGame() {
   return ctx;
 }
 
+// Convenience hook for current epoch
+function useEpoch() {
+  const { state } = useGame();
+  return EPOCHS[state.currentEpochIndex];
+}
+
 // ─── Page Layout ──────────────────────────────────────────────────────────────
 
 function PageLayout({ children }: { children: React.ReactNode }) {
   const { state } = useGame();
+  const epoch = useEpoch();
   return (
     <div
-      className="h-screen flex flex-col overflow-hidden select-none bg-background text-foreground"
-      style={{ fontFamily: "'Inter', sans-serif" }}
+      className="h-screen flex flex-col overflow-hidden select-none"
+      style={{ 
+        fontFamily: "'Inter', sans-serif",
+        backgroundColor: epoch.colors.background,
+      }}
     >
       <Header
         level={state.level}
@@ -1003,6 +1090,190 @@ function ExpeditionPage() {
   );
 }
 
+// ─── Boosters Page ─────────────────────────────────────────────────────────────
+
+function BoostersPage() {
+  const { state, setState } = useGame();
+  const epoch = useEpoch();
+
+  const handleWatchAd = (boostType: "xp" | "currency") => {
+    // Simulate watching ad - in real app would integrate with ad SDK
+    const duration = 30;
+    const multiplier = 3;
+    
+    setState(prev => ({
+      ...prev,
+      boosts: [
+        ...prev.boosts.filter(b => b.type !== boostType),
+        { type: boostType, multiplier, minutesLeft: duration }
+      ]
+    }));
+  };
+
+  const activeBoosts = state.boosts;
+
+  return (
+    <PageLayout>
+      <div className="p-3 space-y-4">
+        {/* Header */}
+        <div className="text-center py-2">
+          <h1 className="text-lg font-bold text-white" style={{ fontFamily: "'Cinzel', serif", color: epoch.colors.primary }}>
+            🎁 Бустери
+          </h1>
+          <p className="text-white/40 text-xs mt-1">Дивись рекламу та отримуй x3</p>
+        </div>
+
+        {/* Active Boosts */}
+        {activeBoosts.length > 0 && (
+          <div className="rounded-2xl p-4 border" style={{ backgroundColor: `${epoch.colors.primary}10`, borderColor: epoch.colors.border }}>
+            <div className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: epoch.colors.primary }}>
+              ⏱️ Активні бустери
+            </div>
+            <div className="space-y-2">
+              {activeBoosts.map((boost, i) => (
+                <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-black/20">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{boost.type === "xp" ? "⚡" : "💰"}</span>
+                    <div>
+                      <div className="text-white/90 text-sm font-semibold">
+                        x{boost.multiplier} {boost.type === "xp" ? "XP" : "Валюта"}
+                      </div>
+                      <div className="text-white/40 text-xs">{boost.minutesLeft} хв</div>
+                    </div>
+                  </div>
+                  <div className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: `${epoch.colors.success}30`, color: epoch.colors.success }}>
+                    Активний
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Available Boosts */}
+        <div className="space-y-3">
+          <div className="text-xs font-semibold uppercase tracking-wider text-white/30 px-1">
+            Доступні бустери
+          </div>
+
+          {/* XP Boost */}
+          <div 
+            className="rounded-2xl p-4 border transition-all hover:scale-[1.02]"
+            style={{ backgroundColor: `${epoch.colors.primary}10`, borderColor: epoch.colors.border }}
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-4">
+                <div 
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl"
+                  style={{ backgroundColor: `${epoch.colors.primary}20` }}
+                >
+                  ⚡
+                </div>
+                <div>
+                  <div className="text-white font-semibold" style={{ fontFamily: "'Cinzel', serif" }}>
+                    x3 XP на 30 хвилин
+                  </div>
+                  <div className="text-white/50 text-sm mt-1">
+                    Всі тапи приносять в 3 рази більше досвіду
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => handleWatchAd("xp")}
+              className="w-full mt-4 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all"
+              style={{ 
+                backgroundColor: epoch.colors.primary,
+                color: epoch.colors.background,
+              }}
+            >
+              <IcoPlay className="w-4 h-4" />
+              Дивитись рекламу
+            </button>
+          </div>
+
+          {/* Currency Boost */}
+          <div 
+            className="rounded-2xl p-4 border transition-all hover:scale-[1.02]"
+            style={{ backgroundColor: `${epoch.colors.primary}10`, borderColor: epoch.colors.border }}
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-4">
+                <div 
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl"
+                  style={{ backgroundColor: `${epoch.colors.primary}20` }}
+                >
+                  💰
+                </div>
+                <div>
+                  <div className="text-white font-semibold" style={{ fontFamily: "'Cinzel', serif" }}>
+                    x3 Валюта на 30 хвилин
+                  </div>
+                  <div className="text-white/50 text-sm mt-1">
+                    Всі тапи приносять в 3 рази більше монет
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => handleWatchAd("currency")}
+              className="w-full mt-4 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all"
+              style={{ 
+                backgroundColor: epoch.colors.primary,
+                color: epoch.colors.background,
+              }}
+            >
+              <IcoPlay className="w-4 h-4" />
+              Дивитись рекламу
+            </button>
+          </div>
+
+          {/* Passive Boost */}
+          <div 
+            className="rounded-2xl p-4 border transition-all hover:scale-[1.02]"
+            style={{ backgroundColor: `${epoch.colors.primary}10`, borderColor: epoch.colors.border }}
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-4">
+                <div 
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl"
+                  style={{ backgroundColor: `${epoch.colors.primary}20` }}
+                >
+                  📈
+                </div>
+                <div>
+                  <div className="text-white font-semibold" style={{ fontFamily: "'Cinzel', serif" }}>
+                    x3 Пасивний дохід на 30 хвилин
+                  </div>
+                  <div className="text-white/50 text-sm mt-1">
+                    Генератори працюють в 3 рази швидше
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => handleWatchAd("passive")}
+              className="w-full mt-4 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all"
+              style={{ 
+                backgroundColor: epoch.colors.primary,
+                color: epoch.colors.background,
+              }}
+            >
+              <IcoPlay className="w-4 h-4" />
+              Дивитись рекламу
+            </button>
+          </div>
+        </div>
+
+        {/* Info */}
+        <div className="text-center text-white/30 text-xs py-4">
+          {epoch.currencyIcon} Один бустер = 30 хвилин x3
+        </div>
+      </div>
+    </PageLayout>
+  );
+}
+
 // ─── Root App ─────────────────────────────────────────────────────────────────
 
 export default function App() {
@@ -1021,6 +1292,7 @@ export default function App() {
       { type: "xp",      multiplier: 2,   minutesLeft: 47 },
       { type: "currency",multiplier: 1.5, minutesLeft: 23 },
     ],
+    currentEpochIndex: 6,
   });
 
   const tapId  = useRef(0);
@@ -1051,12 +1323,17 @@ export default function App() {
     setTimeout(() => setTapEvents(prev => prev.filter(e => e.id !== id)), 1100);
   }, []);
 
+  const setEpoch = useCallback((index: number) => {
+    setState(prev => ({ ...prev, currentEpochIndex: index }));
+  }, []);
+
   return (
     <BrowserRouter>
-      <GameContext.Provider value={{ state, tapEvents, handleTap }}>
+      <GameContext.Provider value={{ state, tapEvents, handleTap, setEpoch, setState }}>
         <Routes>
           <Route path="/tap"        element={<TapPage />} />
           <Route path="/"           element={<GameTasksPage />} />
+          <Route path="/boosters"   element={<BoostersPage />} />
           <Route path="/artifacts"  element={<ArtifactsPage />} />
           <Route path="/profile"    element={<ProfilePage />} />
           <Route path="/settings"   element={<SettingsPage />} />
