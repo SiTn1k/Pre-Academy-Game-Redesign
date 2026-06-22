@@ -1,5 +1,6 @@
-import { useState, useCallback, useRef } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import React, { useState, useCallback, useRef } from "react";
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router";
+import { motion } from "motion/react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -9,8 +10,6 @@ interface TapEvent {
   yPct: number;
   value: number;
 }
-
-type TabId = "game" | "artifacts" | "expedition" | "profile" | "settings";
 
 // ─── Game Data (demo) ─────────────────────────────────────────────────────────
 
@@ -750,7 +749,7 @@ function SettingsTab() {
 // ─── Navigation ───────────────────────────────────────────────────────────────
 
 type NavItem = {
-  id: TabId;
+  path: string;
   label: string;
   Icon: React.FC<{ className?: string }>;
   badge?: number;
@@ -758,32 +757,35 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { id: "game",       label: "Гра",      Icon: IcoGamepad  },
-  { id: "artifacts",  label: "Реліквії", Icon: IcoGem,    badge: 2 },
-  { id: "expedition", label: "Академія", Icon: IcoSword,  locked: true },
-  { id: "profile",    label: "Профіль",  Icon: IcoUser     },
-  { id: "settings",   label: "",         Icon: IcoSettings },
+  { path: "/",           label: "Гра",      Icon: IcoGamepad  },
+  { path: "/artifacts",  label: "Реліквії", Icon: IcoGem,    badge: 2 },
+  { path: "/expedition", label: "Академія", Icon: IcoSword,  locked: true },
+  { path: "/profile",   label: "Профіль",  Icon: IcoUser     },
+  { path: "/settings",   label: "",         Icon: IcoSettings },
 ];
 
-function Navigation({ tab, setTab }: { tab: TabId; setTab: (t: TabId) => void }) {
+function Navigation() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   return (
     <div
       className="shrink-0 bg-[#07090F]/99 border-t border-amber-400/10"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="flex">
-        {NAV_ITEMS.map(({ id, label, Icon, badge, locked }) => {
-          const active = tab === id;
+        {NAV_ITEMS.map(({ path, label, Icon, badge, locked }) => {
+          const isActive = location.pathname === path;
           return (
             <button
-              key={id}
+              key={path}
               className={`flex-1 flex flex-col items-center justify-center gap-1 py-2.5 relative transition-all ${
-                locked ? "opacity-35" : active ? "opacity-100" : "opacity-45 hover:opacity-70"
+                locked ? "opacity-35" : isActive ? "opacity-100" : "opacity-45 hover:opacity-70"
               }`}
-              onClick={() => !locked && setTab(id)}
+              onClick={() => !locked && navigate(path)}
             >
               <div className="relative">
-                <Icon className={`w-5 h-5 transition-colors ${active ? "text-amber-400" : "text-white/60"}`} />
+                <Icon className={`w-5 h-5 transition-colors ${isActive ? "text-amber-400" : "text-white/60"}`} />
                 {locked && (
                   <IcoLock className="absolute -top-1.5 -right-2 w-3 h-3 text-white/40" />
                 )}
@@ -794,11 +796,11 @@ function Navigation({ tab, setTab }: { tab: TabId; setTab: (t: TabId) => void })
                 )}
               </div>
               {label && (
-                <span className={`text-[10px] font-medium transition-colors ${active ? "text-amber-400" : "text-white/35"}`}>
+                <span className={`text-[10px] font-medium transition-colors ${isActive ? "text-amber-400" : "text-white/35"}`}>
                   {label}
                 </span>
               )}
-              {active && (
+              {isActive && (
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-0.5 bg-amber-400 rounded-full" />
               )}
             </button>
@@ -809,12 +811,152 @@ function Navigation({ tab, setTab }: { tab: TabId; setTab: (t: TabId) => void })
   );
 }
 
+// ─── Game State Context ───────────────────────────────────────────────────────
+
+interface GameState {
+  level: number;
+  xp: number;
+  xpToNext: number;
+  currency: number;
+  passivePerSec: number;
+  tapPower: number;
+  energy: number;
+  maxEnergy: number;
+  dailyStreak: number;
+  boosts: { type: string; multiplier: number; minutesLeft: number }[];
+}
+
+interface GameContextValue {
+  state: GameState;
+  tapEvents: TapEvent[];
+  handleTap: () => void;
+}
+
+const GameContext = React.createContext<GameContextValue | null>(null);
+
+function useGame() {
+  const ctx = React.useContext(GameContext);
+  if (!ctx) throw new Error("useGame must be used within GameProvider");
+  return ctx;
+}
+
+// ─── Page Layout ──────────────────────────────────────────────────────────────
+
+function PageLayout({ children }: { children: React.ReactNode }) {
+  const { state } = useGame();
+  return (
+    <div
+      className="h-screen flex flex-col overflow-hidden select-none bg-background text-foreground"
+      style={{ fontFamily: "'Inter', sans-serif" }}
+    >
+      <Header
+        level={state.level}
+        xp={state.xp}
+        xpToNext={state.xpToNext}
+        currency={state.currency}
+        passivePerSec={state.passivePerSec}
+      />
+      <AdBanner position="top" />
+      <div className="flex-1 overflow-y-auto">
+        {children}
+      </div>
+      <AdBanner position="bottom" />
+      <Navigation />
+    </div>
+  );
+}
+
+// ─── Game Page ────────────────────────────────────────────────────────────────
+
+function GamePage() {
+  const { state, tapEvents, handleTap } = useGame();
+  return (
+    <PageLayout>
+      <div className="shrink-0 h-[248px] sm:h-[288px] md:h-[320px]">
+        <GameCanvas
+          onTap={handleTap}
+          tapEvents={tapEvents}
+          tapPower={state.tapPower}
+        />
+      </div>
+      <BoosterBar
+        boosts={state.boosts}
+        energy={state.energy}
+        maxEnergy={state.maxEnergy}
+        streak={state.dailyStreak}
+      />
+      <div className="shrink-0 px-4 py-1">
+        <OrnamentalDivider />
+      </div>
+      <div className="p-3 space-y-2.5">
+        <DailyTasksCard />
+        <div
+          className="text-white/25 text-[9px] uppercase tracking-[3px] px-1 pt-1"
+          style={{ fontFamily: "'Cinzel', serif" }}
+        >
+          Генератори
+        </div>
+        {GENERATORS.map(gen => (
+          <GeneratorCard key={gen.id} gen={gen} currency={state.currency} />
+        ))}
+        <div className="h-2" />
+      </div>
+    </PageLayout>
+  );
+}
+
+// ─── Artifacts Page ──────────────────────────────────────────────────────────
+
+function ArtifactsPage() {
+  return (
+    <PageLayout>
+      <ArtifactsTab />
+    </PageLayout>
+  );
+}
+
+// ─── Profile Page ─────────────────────────────────────────────────────────────
+
+function ProfilePage() {
+  const { state } = useGame();
+  return (
+    <PageLayout>
+      <ProfileTab level={state.level} currency={state.currency} streak={state.dailyStreak} />
+    </PageLayout>
+  );
+}
+
+// ─── Settings Page ────────────────────────────────────────────────────────────
+
+function SettingsPage() {
+  return (
+    <PageLayout>
+      <SettingsTab />
+    </PageLayout>
+  );
+}
+
+// ─── Expedition Page ───────────────────────────────────────────────────────────
+
+function ExpeditionPage() {
+  return (
+    <PageLayout>
+      <div className="flex flex-col items-center justify-center h-full gap-4 p-6">
+        <div className="text-5xl">🔒</div>
+        <div className="text-center">
+          <div className="text-white/80 font-semibold mb-1" style={{ fontFamily: "'Cinzel', serif" }}>Академія заблокована</div>
+          <div className="text-white/40 text-sm">Розблоковується на 2-му переродженні</div>
+        </div>
+      </div>
+    </PageLayout>
+  );
+}
+
 // ─── Root App ─────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const [tab, setTab] = useState<TabId>("game");
   const [tapEvents, setTapEvents] = useState<TapEvent[]>([]);
-  const [state, setState] = useState({
+  const [state, setState] = useState<GameState>({
     level:         42,
     xp:            3400,
     xpToNext:      5000,
@@ -839,7 +981,6 @@ export default function App() {
     const value = s.tapPower + Math.floor(Math.random() * Math.ceil(s.tapPower * 0.18));
     const id    = ++tapId.current;
 
-    // Random position near center of canvas (expressed as %)
     const xPct = 42 + Math.random() * 16;
     const yPct = 28 + Math.random() * 30;
 
@@ -860,113 +1001,16 @@ export default function App() {
   }, []);
 
   return (
-    <div
-      className="h-screen flex flex-col overflow-hidden select-none bg-background text-foreground"
-      style={{ fontFamily: "'Inter', sans-serif" }}
-    >
-      {/* ── Header ── */}
-      <Header
-        level={state.level}
-        xp={state.xp}
-        xpToNext={state.xpToNext}
-        currency={state.currency}
-        passivePerSec={state.passivePerSec}
-      />
-
-      {/* ── Top Ad Slot ── */}
-      <AdBanner position="top" />
-
-      {/* ── Game Canvas (always visible) ── */}
-      <div className="shrink-0 h-[248px] sm:h-[288px] md:h-[320px]">
-        <GameCanvas
-          onTap={handleTap}
-          tapEvents={tapEvents}
-          tapPower={state.tapPower}
-        />
-      </div>
-
-      {/* ── Booster / Energy Bar ── */}
-      <BoosterBar
-        boosts={state.boosts}
-        energy={state.energy}
-        maxEnergy={state.maxEnergy}
-        streak={state.dailyStreak}
-      />
-
-      {/* ── Divider ── */}
-      <div className="shrink-0 px-4 py-1">
-        <OrnamentalDivider />
-      </div>
-
-      {/* ── Tab Content ── */}
-      <div className="flex-1 overflow-hidden">
-        <AnimatePresence mode="wait">
-          {tab === "game" && (
-            <motion.div
-              key="game"
-              className="h-full overflow-y-auto p-3 space-y-2.5"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.18 }}
-            >
-              <DailyTasksCard />
-              <div
-                className="text-white/25 text-[9px] uppercase tracking-[3px] px-1 pt-1"
-                style={{ fontFamily: "'Cinzel', serif" }}
-              >
-                Генератори
-              </div>
-              {GENERATORS.map(gen => (
-                <GeneratorCard key={gen.id} gen={gen} currency={state.currency} />
-              ))}
-              <div className="h-2" />
-            </motion.div>
-          )}
-
-          {tab === "artifacts" && (
-            <motion.div key="artifacts" className="h-full"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}>
-              <ArtifactsTab />
-            </motion.div>
-          )}
-
-          {tab === "profile" && (
-            <motion.div key="profile" className="h-full"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}>
-              <ProfileTab level={state.level} currency={state.currency} streak={state.dailyStreak} />
-            </motion.div>
-          )}
-
-          {tab === "settings" && (
-            <motion.div key="settings" className="h-full"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}>
-              <SettingsTab />
-            </motion.div>
-          )}
-
-          {tab === "expedition" && (
-            <motion.div key="expedition" className="h-full flex flex-col items-center justify-center gap-4 p-6"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}>
-              <div className="text-5xl">🔒</div>
-              <div className="text-center">
-                <div className="text-white/80 font-semibold mb-1" style={{ fontFamily: "'Cinzel', serif" }}>Академія заблокована</div>
-                <div className="text-white/40 text-sm">Розблоковується на 2-му переродженні</div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* ── Bottom Ad Slot ── */}
-      <AdBanner position="bottom" />
-
-      {/* ── Navigation ── */}
-      <Navigation tab={tab} setTab={setTab} />
-    </div>
+    <BrowserRouter>
+      <GameContext.Provider value={{ state, tapEvents, handleTap }}>
+        <Routes>
+          <Route path="/"           element={<GamePage />} />
+          <Route path="/artifacts"  element={<ArtifactsPage />} />
+          <Route path="/profile"    element={<ProfilePage />} />
+          <Route path="/settings"   element={<SettingsPage />} />
+          <Route path="/expedition" element={<ExpeditionPage />} />
+        </Routes>
+      </GameContext.Provider>
+    </BrowserRouter>
   );
 }
