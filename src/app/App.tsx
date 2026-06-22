@@ -985,37 +985,95 @@ function PageLayout({ children }: { children: React.ReactNode }) {
 // ─── Full Screen Tap Page ─────────────────────────────────────────────────────
 
 function TapPage() {
-  const { state, tapEvents, handleTap } = useGame();
+  const { state, tapEvents, handleTap, setEpoch } = useGame();
+  const epoch = useEpoch();
+  const [showEpochSelector, setShowEpochSelector] = useState(false);
+  const [tapParticles, setTapParticles] = useState<{id: number; x: number; y: number; color: string}[]>([]);
+  const [comboText, setComboText] = useState("");
+  const particleId = useRef(0);
+
+  const handleTapWithEffects = (e: React.TouchEvent | React.MouseEvent) => {
+    handleTap();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const newParticles = Array.from({ length: 8 }, () => ({
+      id: particleId.current++,
+      x: clientX,
+      y: clientY,
+      color: Math.random() > 0.5 ? epoch.colors.primary : epoch.colors.accent,
+    }));
+    setTapParticles(prev => [...prev, ...newParticles]);
+    setTimeout(() => {
+      setTapParticles(prev => prev.filter(p => !newParticles.find(np => np.id === p.id)));
+    }, 800);
+    if (Math.random() > 0.85) {
+      const combos = ["🔥 КОМБО!", "⚡ СУПЕР!", "💥 МЕГА!", "🌟 ЛЕГЕНДАРНО!"];
+      setComboText(combos[Math.floor(Math.random() * combos.length)]);
+      setTimeout(() => setComboText(""), 800);
+    }
+  };
+
   return (
-    <div
-      className="h-screen w-screen overflow-hidden select-none bg-background text-foreground"
-      style={{ fontFamily: "'Inter', sans-serif" }}
-    >
-      {/* Full header */}
-      <Header
-        level={state.level}
-        xp={state.xp}
-        xpToNext={state.xpToNext}
-        currency={state.currency}
-        passivePerSec={state.passivePerSec}
-      />
-
-      {/* Full screen game canvas */}
-      <div className="w-full h-full">
-        <GameCanvas
-          onTap={handleTap}
-          tapEvents={tapEvents}
-          tapPower={state.tapPower}
-        />
+    <div className="h-screen w-screen overflow-hidden select-none" style={{ fontFamily: "'Inter', sans-serif" }}>
+      {/* Background with gradient layers */}
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 50% 30%, ${epoch.colors.primary}15 0%, transparent 50%), radial-gradient(ellipse at 20% 80%, ${epoch.colors.secondary}10 0%, transparent 40%), radial-gradient(ellipse at 80% 70%, ${epoch.colors.accent}08 0%, transparent 35%), ${epoch.colors.background}` }} />
+      
+      {/* Animated stars/particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(20)].map((_, i) => (
+          <div key={i} className="absolute w-1 h-1 rounded-full animate-pulse" style={{ left: `${(i * 17 + 5) % 100}%`, top: `${(i * 23 + 10) % 100}%`, backgroundColor: epoch.colors.primary, opacity: 0.3 + (i % 5) * 0.1, animationDuration: `${2 + (i % 3)}s`, animationDelay: `${i * 0.2}s` }} />
+        ))}
       </div>
 
-      {/* Bottom nav for tap page */}
-      <div
-        className="absolute bottom-0 left-0 right-0 z-10"
-        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-      >
-        <Navigation />
+      <Header level={state.level} xp={state.xp} xpToNext={state.xpToNext} currency={state.currency} passivePerSec={state.passivePerSec} />
+
+      {/* Epoch selector */}
+      <div className="absolute top-20 left-1/2 -translate-x-1/2 z-20">
+        <button onClick={() => setShowEpochSelector(!showEpochSelector)} className="flex items-center gap-2 px-4 py-2 rounded-full border transition-all hover:scale-105" style={{ backgroundColor: `${epoch.colors.primary}20`, borderColor: epoch.colors.border }}>
+          <span className="text-lg">{epoch.icon}</span>
+          <span className="text-xs font-semibold" style={{ color: epoch.colors.primary }}>{epoch.shortName}</span>
+          <svg className={`w-4 h-4 transition-transform ${showEpochSelector ? 'rotate-180' : ''}`} style={{ color: epoch.colors.primary }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+        </button>
+        {showEpochSelector && (
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-72 max-h-80 overflow-y-auto rounded-2xl border shadow-2xl" style={{ backgroundColor: `${epoch.colors.background}f0`, borderColor: epoch.colors.border, backdropFilter: 'blur(20px)' }}>
+            <div className="p-2 space-y-1">
+              {EPOCHS.map((e, i) => (
+                <button key={e.id} onClick={() => { setEpoch(i); setShowEpochSelector(false); }} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${i === state.currentEpochIndex ? 'scale-105' : 'hover:scale-[1.02]'}`} style={{ backgroundColor: i === state.currentEpochIndex ? `${e.colors.primary}30` : 'transparent' }}>
+                  <span className="text-2xl">{e.icon}</span>
+                  <div className="text-left flex-1">
+                    <div className="text-white text-sm font-semibold">{e.shortName}</div>
+                    <div className="text-white/40 text-[10px]">{e.period}</div>
+                  </div>
+                  {i === state.currentEpochIndex && <svg className="w-5 h-5" style={{ color: e.colors.primary }} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </div>
+
+      <div className="w-full h-full"><GameCanvas onTap={handleTapWithEffects} tapEvents={tapEvents} tapPower={state.tapPower} /></div>
+
+      {/* Tap particles */}
+      {tapParticles.map(p => (
+        <motion.div key={p.id} className="absolute w-2 h-2 rounded-full pointer-events-none" style={{ left: p.x, top: p.y, backgroundColor: p.color, boxShadow: `0 0 10px ${p.color}` }} initial={{ opacity: 1, scale: 1 }} animate={{ opacity: 0, scale: 0, y: -100 }} transition={{ duration: 0.8, ease: "easeOut" }} />
+      ))}
+
+      {/* Combo text */}
+      {comboText && (
+        <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1.2 }} exit={{ opacity: 0, scale: 0.5 }} className="absolute top-1/3 left-1/2 -translate-x-1/2 pointer-events-none" style={{ color: epoch.colors.primary, textShadow: `0 0 20px ${epoch.colors.primary}`, fontFamily: "'Cinzel', serif", fontSize: '2rem', fontWeight: 'bold' }}>
+          {comboText}
+        </motion.div>
+      )}
+
+      {/* Decorative rings */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="absolute rounded-full border" style={{ width: `${250 + i * 100}px`, height: `${250 + i * 100}px`, borderColor: `${epoch.colors.primary}${Math.max(5, 20 - i * 7)}`, animation: `spin ${20 + i * 10}s linear infinite`, animationDirection: i % 2 === 0 ? 'reverse' : 'normal' }} />
+        ))}
+      </div>
+
+      <div className="absolute bottom-0 left-0 right-0 z-10" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}><Navigation /></div>
     </div>
   );
 }
