@@ -1110,32 +1110,109 @@ function ArtifactsTab() {
   const { state } = useGame();
   const epoch = useEpoch();
   const artifacts = getArtifacts(state.currentEpochIndex);
+  const [adTimer, setAdTimer] = React.useState(0);
+  const [revealedArtifact, setRevealedArtifact] = React.useState<Artifact | null>(null);
+
+  React.useEffect(() => {
+    if (adTimer > 0) {
+      const interval = setInterval(() => setAdTimer(t => Math.max(0, t - 1)), 1000);
+      return () => clearInterval(interval);
+    }
+  }, [adTimer]);
+
+  const handleNormalOpen = () => {
+    if (state.currency < 500) return;
+    const randomArtifact = artifacts[Math.floor(Math.random() * artifacts.length)];
+    setRevealedArtifact(randomArtifact);
+  };
+
+  const handleAdOpen = () => {
+    if (adTimer > 0) return;
+    setAdTimer(300);
+    const randomArtifact = artifacts[Math.floor(Math.random() * artifacts.length)];
+    setRevealedArtifact(randomArtifact);
+  };
+
+  const handleStarsOpen = () => {
+    const randomArtifact = PREMIUM_ARTIFACTS[Math.floor(Math.random() * PREMIUM_ARTIFACTS.length)];
+    setRevealedArtifact(randomArtifact);
+  };
+
+  const formatTime = (seconds: number) => `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
 
   return (
     <div className="h-full flex flex-col">
-      <div className="p-4 border-b flex items-center justify-between shrink-0" style={{ borderColor: `${epoch.colors.primary}20` }}>
-        <div>
-          <div className="text-white/90 font-semibold text-sm" style={{ fontFamily: "'Cinzel', serif" }}>
-            Артефакти {epoch.shortName}
-          </div>
-          <div className="text-xs mt-0.5" style={{ color: `${epoch.colors.primary}60` }}>
-            {artifacts.length} унікальних артефактів епохи
-          </div>
+      {/* Header */}
+      <div className="p-4 border-b shrink-0" style={{ borderColor: `${epoch.colors.primary}20` }}>
+        <div className="text-white/90 font-semibold text-sm mb-3" style={{ fontFamily: "'Cinzel', serif" }}>
+          Артефакти {epoch.shortName}
         </div>
-        <button 
-          className="text-xs font-bold px-3 py-2 rounded-xl active:scale-95 transition-transform"
-          style={{ backgroundColor: epoch.colors.primary, color: epoch.colors.background }}
-        >
-          📦 Відкрити (500 {epoch.currencyIcon})
-        </button>
+        
+        {/* Three opening buttons */}
+        <div className="grid grid-cols-3 gap-2">
+          {/* Coins */}
+          <button
+            onClick={handleNormalOpen}
+            disabled={state.currency < 500}
+            className="flex flex-col items-center p-3 rounded-xl border transition-all active:scale-95"
+            style={{
+              backgroundColor: state.currency >= 500 ? `${epoch.colors.primary}20` : `${epoch.colors.primary}10`,
+              borderColor: state.currency >= 500 ? epoch.colors.primary : `${epoch.colors.primary}40`,
+              opacity: state.currency >= 500 ? 1 : 0.5,
+            }}
+          >
+            <span className="text-2xl mb-1">🪙</span>
+            <span className="text-xs font-bold" style={{ color: epoch.colors.primary }}>500</span>
+            <span className="text-[9px] text-white/50">Монет</span>
+          </button>
+
+          {/* Ad */}
+          <button
+            onClick={handleAdOpen}
+            disabled={adTimer > 0}
+            className="flex flex-col items-center p-3 rounded-xl border transition-all active:scale-95"
+            style={{
+              backgroundColor: adTimer > 0 ? `${epoch.colors.accent}10` : `${epoch.colors.accent}20`,
+              borderColor: adTimer > 0 ? `${epoch.colors.accent}40` : epoch.colors.accent,
+              opacity: adTimer > 0 ? 0.5 : 1,
+            }}
+          >
+            <span className="text-2xl mb-1">📺</span>
+            <span className="text-xs font-bold" style={{ color: epoch.colors.accent }}>
+              {adTimer > 0 ? formatTime(adTimer) : "FREE"}
+            </span>
+            <span className="text-[9px] text-white/50">
+              {adTimer > 0 ? formatTime(adTimer) : "Реклама"}
+            </span>
+          </button>
+
+          {/* Stars */}
+          <button
+            onClick={handleStarsOpen}
+            className="flex flex-col items-center p-3 rounded-xl border transition-all active:scale-95"
+            style={{
+              backgroundColor: "#7C3AED20",
+              borderColor: "#7C3AED",
+            }}
+          >
+            <span className="text-2xl mb-1">⭐</span>
+            <span className="text-xs font-bold text-violet-400">15</span>
+            <span className="text-[9px] text-violet-300">Stars</span>
+          </button>
+        </div>
       </div>
+
+      {/* Artifacts grid */}
       <div className="flex-1 overflow-y-auto p-3">
+        <div className="text-[10px] uppercase tracking-wider mb-2 px-1" style={{ color: `${epoch.colors.primary}60` }}>
+          Зібрані артефакти ({artifacts.length})
+        </div>
         <div className="grid grid-cols-2 gap-2.5">
           {artifacts.map((a, i) => (
-            <div 
-              key={i} 
+            <div
+              key={i}
               className="p-3 rounded-2xl border"
-              style={{ 
+              style={{
                 backgroundColor: `${getRarityColor(a.rarity)}10`,
                 borderColor: `${getRarityColor(a.rarity)}40`,
               }}
@@ -1149,7 +1226,87 @@ function ArtifactsTab() {
             </div>
           ))}
         </div>
+
+        {/* Premium Section */}
+        <div className="mt-6">
+          <div className="text-[10px] uppercase tracking-wider mb-3 px-1 flex items-center gap-2" style={{ color: "#A855F7" }}>
+            <span>⭐</span> Premium артефакти
+          </div>
+          <div className="grid grid-cols-2 gap-2.5">
+            {PREMIUM_ARTIFACTS.slice(0, 4).map((a, i) => (
+              <div
+                key={i}
+                className="p-3 rounded-2xl border-2 relative overflow-hidden"
+                style={{
+                  backgroundColor: `${getRarityColor(a.rarity)}15`,
+                  borderColor: getRarityColor(a.rarity),
+                  boxShadow: `0 0 20px ${getRarityColor(a.rarity)}30`,
+                }}
+              >
+                <div className="absolute top-1 right-1 px-1.5 py-0.5 rounded text-[8px] font-bold" style={{ backgroundColor: "#7C3AED", color: "#fff" }}>
+                  ⭐
+                </div>
+                <div className="text-2xl mb-2">{a.icon}</div>
+                <div className="text-[11px] font-semibold text-white/90 leading-tight mb-1">{a.name}</div>
+                <div className="text-[9px] uppercase tracking-wide mb-1" style={{ color: getRarityColor(a.rarity) }}>
+                  {a.rarity}
+                </div>
+                <div className="text-[10px] font-bold" style={{ color: "#A855F7" }}>{a.bonus}</div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
+
+      {/* Reveal Modal */}
+      <AnimatePresence>
+        {revealedArtifact && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ backgroundColor: "rgba(0,0,0,0.9)" }}
+          >
+            <motion.div
+              initial={{ scale: 0.5, y: 100, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="relative w-full max-w-xs rounded-3xl border-2 p-6 text-center"
+              style={{
+                backgroundColor: `${epoch.colors.background}`,
+                borderColor: getRarityColor(revealedArtifact.rarity),
+                boxShadow: `0 0 80px ${getRarityColor(revealedArtifact.rarity)}60`,
+              }}
+            >
+              <div className="absolute inset-0 rounded-3xl" style={{ background: `radial-gradient(ellipse at 50% 0%, ${getRarityColor(revealedArtifact.rarity)}30 0%, transparent 60%)` }} />
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold uppercase" style={{ backgroundColor: getRarityColor(revealedArtifact.rarity), color: "#000" }}>
+                {revealedArtifact.rarity}
+              </div>
+              <div className="text-7xl my-6 relative z-10">{revealedArtifact.icon}</div>
+              <h3 className="text-lg font-bold text-white mb-1 relative z-10" style={{ fontFamily: "'Cinzel', serif" }}>
+                {revealedArtifact.name}
+              </h3>
+              <div className="text-xs mb-3 relative z-10" style={{ color: `${epoch.colors.primary}80` }}>
+                {epoch.name}
+              </div>
+              <p className="text-sm text-white/60 italic mb-4 relative z-10">
+                "{revealedArtifact.description}"
+              </p>
+              <div className="px-4 py-2 rounded-xl mb-6 relative z-10" style={{ backgroundColor: `${epoch.colors.success}20`, color: epoch.colors.success }}>
+                <span className="font-bold text-base">{revealedArtifact.bonus}</span>
+              </div>
+              <button
+                onClick={() => setRevealedArtifact(null)}
+                className="w-full py-3 rounded-xl font-bold relative z-10 transition-transform active:scale-95"
+                style={{ backgroundColor: getRarityColor(revealedArtifact.rarity), color: "#000" }}
+              >
+                Зібрати
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
