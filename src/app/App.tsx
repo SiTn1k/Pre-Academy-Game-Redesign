@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from "react";
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
