@@ -757,10 +757,10 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { path: "/",           label: "Гра",      Icon: IcoGamepad  },
-  { path: "/artifacts",  label: "Реліквії", Icon: IcoGem,    badge: 2 },
+  { path: "/tap",        label: "Гра",      Icon: IcoGamepad  },
+  { path: "/",           label: "Завдання", Icon: IcoGem     },
   { path: "/expedition", label: "Академія", Icon: IcoSword,  locked: true },
-  { path: "/profile",   label: "Профіль",  Icon: IcoUser     },
+  { path: "/profile",    label: "Профіль",  Icon: IcoUser     },
   { path: "/settings",   label: "",         Icon: IcoSettings },
 ];
 
@@ -866,29 +866,66 @@ function PageLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-// ─── Game Page ────────────────────────────────────────────────────────────────
+// ─── Full Screen Tap Page ─────────────────────────────────────────────────────
 
-function GamePage() {
+function TapPage() {
   const { state, tapEvents, handleTap } = useGame();
   return (
-    <PageLayout>
-      <div className="shrink-0 h-[248px] sm:h-[288px] md:h-[320px]">
+    <div
+      className="h-screen w-screen overflow-hidden select-none bg-background text-foreground"
+      style={{ fontFamily: "'Inter', sans-serif" }}
+    >
+      {/* Minimal header */}
+      <div className="absolute top-0 left-0 right-0 z-10 px-4 pt-2 flex items-center justify-between"
+           style={{ paddingTop: "env(safe-area-inset-top)" }}>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-lg">
+            {EPOCH.icon}
+          </div>
+          <div>
+            <div className="text-amber-300 text-xs font-semibold" style={{ fontFamily: "'Cinzel', serif" }}>
+              {EPOCH.name}
+            </div>
+            <div className="text-amber-400/40 text-[10px]">Lv.{state.level}</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            <div className="text-[9px] text-white/30">🪙</div>
+            <div className="text-amber-300 text-xs font-bold" style={{ fontFamily: "'DM Mono', monospace" }}>
+              {fmt(state.currency)}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Full screen game canvas */}
+      <div className="w-full h-full">
         <GameCanvas
           onTap={handleTap}
           tapEvents={tapEvents}
           tapPower={state.tapPower}
         />
       </div>
-      <BoosterBar
-        boosts={state.boosts}
-        energy={state.energy}
-        maxEnergy={state.maxEnergy}
-        streak={state.dailyStreak}
-      />
-      <div className="shrink-0 px-4 py-1">
-        <OrnamentalDivider />
+
+      {/* Bottom nav for tap page */}
+      <div
+        className="absolute bottom-0 left-0 right-0 z-10"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
+        <Navigation />
       </div>
-      <div className="p-3 space-y-2.5">
+    </div>
+  );
+}
+
+// ─── Game Tasks Page ──────────────────────────────────────────────────────────
+
+function GameTasksPage() {
+  const { state } = useGame();
+  return (
+    <PageLayout>
+      <div className="p-3 space-y-3">
         <DailyTasksCard />
         <div
           className="text-white/25 text-[9px] uppercase tracking-[3px] px-1 pt-1"
@@ -1004,7 +1041,8 @@ export default function App() {
     <BrowserRouter>
       <GameContext.Provider value={{ state, tapEvents, handleTap }}>
         <Routes>
-          <Route path="/"           element={<GamePage />} />
+          <Route path="/tap"        element={<TapPage />} />
+          <Route path="/"           element={<GameTasksPage />} />
           <Route path="/artifacts"  element={<ArtifactsPage />} />
           <Route path="/profile"    element={<ProfilePage />} />
           <Route path="/settings"   element={<SettingsPage />} />
