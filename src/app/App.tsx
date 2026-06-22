@@ -18,6 +18,7 @@ interface Epoch {
   name: string;
   shortName: string;
   period: string;
+  description: string;
   icon: string;
   currencyIcon: string;
   currencyName: string;
@@ -33,18 +34,18 @@ interface Epoch {
 }
 
 export const EPOCHS: Epoch[] = [
-  { id: 1, name: "Трипільська культура", shortName: "Трипілля", period: "4500-2700 до н.е.", icon: "🏺", currencyIcon: "🏺", currencyName: "Глиняні мірky", colors: { primary: "#C4783C", secondary: "#8B5E34", accent: "#E8A857", background: "#1A1209", textPrimary: "#E8A857", border: "rgba(232, 168, 87, 0.2)", success: "#8BC34A" } },
-  { id: 2, name: "Скіфія", shortName: "Скіфи", period: "VII-III ст. до н.е.", icon: "⚔️", currencyIcon: "🪙", currencyName: "Скіфські солиди", colors: { primary: "#D4AF37", secondary: "#8B6914", accent: "#FFD700", background: "#0D0D0D", textPrimary: "#FFD700", border: "rgba(255, 215, 0, 0.2)", success: "#90EE90" } },
-  { id: 3, name: "Сарматія", shortName: "Сармати", period: "III ст. до н.е. - IV ст. н.е.", icon: "🏇", currencyIcon: "💎", currencyName: "Бурштин", colors: { primary: "#6B8E9F", secondary: "#4A6670", accent: "#9FCDDF", background: "#0A1520", textPrimary: "#9FCDDF", border: "rgba(159, 205, 223, 0.2)", success: "#7CFC00" } },
-  { id: 4, name: "Античні міста", shortName: "Елліни", period: "VI ст. до н.е. - IV ст. н.е.", icon: "🏛️", currencyIcon: "🪼", currencyName: "Драхми", colors: { primary: "#4A90A4", secondary: "#2E5A6B", accent: "#7EC8E3", background: "#0D1520", textPrimary: "#7EC8E3", border: "rgba(126, 200, 227, 0.2)", success: "#40E0D0" } },
-  { id: 5, name: "Київська Русь", shortName: "Русь", period: "IX-XIII ст.", icon: "⛪", currencyIcon: "🪙", currencyName: "Гривні", colors: { primary: "#4A90D9", secondary: "#1E3A5F", accent: "#6BB3F0", background: "#050A10", textPrimary: "#4A90D9", border: "rgba(74, 144, 217, 0.2)", success: "#4169E1" } },
-  { id: 6, name: "Галицько-Волинське князівство", shortName: "Галичина", period: "XIV-XIV ст.", icon: "🦁", currencyIcon: "🪙", currencyName: "Практи", colors: { primary: "#DC143C", secondary: "#8B0000", accent: "#FF4444", background: "#0F0505", textPrimary: "#DC143C", border: "rgba(220, 20, 60, 0.2)", success: "#228B22" } },
-  { id: 7, name: "Козацька доба", shortName: "Козаки", period: "XVI-XVII ст.", icon: "🏇", currencyIcon: "🪙", currencyName: "Дукати", colors: { primary: "#F5C842", secondary: "#B8860B", accent: "#FFD700", background: "#07090F", textPrimary: "#F5C842", border: "rgba(245, 200, 66, 0.2)", success: "#32CD32" } },
-  { id: 8, name: "Кримське ханство", shortName: "Крим", period: "XV-XVIII ст.", icon: "🕌", currencyIcon: "💰", currencyName: "Аспри", colors: { primary: "#40E0D0", secondary: "#00CED1", accent: "#00FFFF", background: "#031515", textPrimary: "#40E0D0", border: "rgba(64, 224, 208, 0.2)", success: "#2E8B57" } },
-  { id: 9, name: "Українська козацька держава", shortName: "Гетьманщина", period: "XVII-XVIII ст.", icon: "⚜️", currencyIcon: "🪙", currencyName: "Рейтарські златії", colors: { primary: "#9370DB", secondary: "#6A5ACD", accent: "#BA55D3", background: "#050510", textPrimary: "#9370DB", border: "rgba(106, 90, 205, 0.2)", success: "#9370DB" } },
-  { id: 10, name: "Національне відродження", shortName: "Відродження", period: "XIX ст.", icon: "🔱", currencyIcon: "💰", currencyName: "Карбованці", colors: { primary: "#32CD32", secondary: "#228B22", accent: "#00FF00", background: "#031003", textPrimary: "#32CD32", border: "rgba(50, 205, 50, 0.2)", success: "#FFD700" } },
-  { id: 11, name: "УНР та модернізація", shortName: "УНР", period: "1918-1940", icon: "🇺🇦", currencyIcon: "💴", currencyName: "Українські карбованці", colors: { primary: "#FFD700", secondary: "#005BBB", accent: "#005BBB", background: "#030810", textPrimary: "#FFD700", border: "rgba(0, 91, 187, 0.2)", success: "#005BBB" } },
-  { id: 12, name: "Незалежна Україна", shortName: "Незалежність", period: "1991-дотепер", icon: "🇺🇦", currencyIcon: "₴", currencyName: "Гривні", colors: { primary: "#FFD700", secondary: "#005BBB", accent: "#005BBB", background: "#040810", textPrimary: "#FFD700", border: "rgba(0, 91, 187, 0.25)", success: "#228B22" } },
+  { id: 1, name: "Трипільська культура", shortName: "Трипілля", period: "4500–2700 до н.е.", description: "Перша велика землеробська цивілізація на території сучасної України та один з найбільших центрів ранньосередньовічної культури.", icon: "🏺", currencyIcon: "🏺", currencyName: "Глиняні мірky", colors: { primary: "#C4783C", secondary: "#8B5E34", accent: "#E8A857", background: "#1A1209", textPrimary: "#E8A857", border: "rgba(232, 168, 87, 0.2)", success: "#8BC34A" } },
+  { id: 2, name: "Скіфія", shortName: "Скіфи", period: "VII–III ст. до н.е.", description: "Воїни-номади, які створили величну культуру золотого віку. Скіфське мистецтво вражає світ донині.", icon: "⚔️", currencyIcon: "🪙", currencyName: "Скіфські солиди", colors: { primary: "#D4AF37", secondary: "#8B6914", accent: "#FFD700", background: "#0D0D0D", textPrimary: "#FFD700", border: "rgba(255, 215, 0, 0.2)", success: "#90EE90" } },
+  { id: 3, name: "Сарматія", shortName: "Сармати", period: "III ст. до н.е. – IV ст. н.е.", description: "Легендарні вершники, чиї традиції вплинули на культуру слов'янських народів. Амазонки — їх найвідоміші жінки-воїни.", icon: "🏇", currencyIcon: "💎", currencyName: "Бурштин", colors: { primary: "#6B8E9F", secondary: "#4A6670", accent: "#9FCDDF", background: "#0A1520", textPrimary: "#9FCDDF", border: "rgba(159, 205, 223, 0.2)", success: "#7CFC00" } },
+  { id: 4, name: "Античні міста", shortName: "Елліни", period: "VI ст. до н.е. – IV ст. н.е.", description: "Грецькі колонії на теренах України — Ольвія, Херсонес, Пантікапей. Колиска античної цивілізації.", icon: "🏛️", currencyIcon: "🪼", currencyName: "Драхми", colors: { primary: "#4A90A4", secondary: "#2E5A6B", accent: "#7EC8E3", background: "#0D1520", textPrimary: "#7EC8E3", border: "rgba(126, 200, 227, 0.2)", success: "#40E0D0" } },
+  { id: 5, name: "Київська Русь", shortName: "Русь", period: "IX–XIII ст.", description: "Перша держава східних слов'ян. Київ — мати городів руських. Софія Київська — світова спадщина ЮНЕСКО.", icon: "⛪", currencyIcon: "🪙", currencyName: "Гривні", colors: { primary: "#4A90D9", secondary: "#1E3A5F", accent: "#6BB3F0", background: "#050A10", textPrimary: "#4A90D9", border: "rgba(74, 144, 217, 0.2)", success: "#4169E1" } },
+  { id: 6, name: "Галицько-Волинське князівство", shortName: "Галичина", period: "XIV–XIV ст.", description: "Наступник Київської Русі. Єдине східнослов'янське королівство в історії — Королівство Русь.", icon: "🦁", currencyIcon: "🪙", currencyName: "Практи", colors: { primary: "#DC143C", secondary: "#8B0000", accent: "#FF4444", background: "#0F0505", textPrimary: "#DC143C", border: "rgba(220, 20, 60, 0.2)", success: "#228B22" } },
+  { id: 7, name: "Козацька доба", shortName: "Козаки", period: "XVI–XVII ст.", description: "Вільні воїни-захисники українського народу. Запорозька Січ — символ козацької волі та державницьких традицій.", icon: "🏇", currencyIcon: "🪙", currencyName: "Дукати", colors: { primary: "#F5C842", secondary: "#B8860B", accent: "#FFD700", background: "#07090F", textPrimary: "#F5C842", border: "rgba(245, 200, 66, 0.2)", success: "#32CD32" } },
+  { id: 8, name: "Кримське ханство", shortName: "Крим", period: "XV–XVIII ст.", description: "Остання ханська держава в історії Європи. Бахчисарай — столиця кримськотатарського народу.", icon: "🕌", currencyIcon: "💰", currencyName: "Аспри", colors: { primary: "#40E0D0", secondary: "#00CED1", accent: "#00FFFF", background: "#031515", textPrimary: "#40E0D0", border: "rgba(64, 224, 208, 0.2)", success: "#2E8B57" } },
+  { id: 9, name: "Українська козацька держава", shortName: "Гетьманщина", period: "XVII–XVIII ст.", description: "Автономна козацька держава під протекторатом Російської та Османської імперій з власними дипломатиними традиціями.", icon: "⚜️", currencyIcon: "🪙", currencyName: "Рейтарські златії", colors: { primary: "#9370DB", secondary: "#6A5ACD", accent: "#BA55D3", background: "#050510", textPrimary: "#9370DB", border: "rgba(106, 90, 205, 0.2)", success: "#9370DB" } },
+  { id: 10, name: "Національне відродження", shortName: "Відродження", period: "XIX ст.", description: "Період національного пробудження. Тарас Шевченко та Іван Франко — генії, що заснували сучасну українську літературу.", icon: "🔱", currencyIcon: "💰", currencyName: "Карбованці", colors: { primary: "#32CD32", secondary: "#228B22", accent: "#00FF00", background: "#031003", textPrimary: "#32CD32", border: "rgba(50, 205, 50, 0.2)", success: "#FFD700" } },
+  { id: 11, name: "УНР та модернізація", shortName: "УНР", period: "1918–1940", description: "Перша незалежна українська держава XX століття. Героїка боротьби за independence триває в серцях українців.", icon: "🇺🇦", currencyIcon: "💴", currencyName: "Українські карбованці", colors: { primary: "#FFD700", secondary: "#005BBB", accent: "#005BBB", background: "#030810", textPrimary: "#FFD700", border: "rgba(0, 91, 187, 0.2)", success: "#005BBB" } },
+  { id: 12, name: "Незалежна Україна", shortName: "Незалежність", period: "1991–дотепер", description: "Сучасна незалежна держава. Героїчний народ будує демократичну Європейську Україну попри всі випробування.", icon: "🇺🇦", currencyIcon: "₴", currencyName: "Гривні", colors: { primary: "#FFD700", secondary: "#005BBB", accent: "#005BBB", background: "#040810", textPrimary: "#FFD700", border: "rgba(0, 91, 187, 0.25)", success: "#228B22" } },
 ];
 
 // Current epoch (default - index 6 = Cossack era)
@@ -86,6 +87,84 @@ function fmtTime(minutes: number): string {
 }
 
 // ─── SVG Decorations ─────────────────────────────────────────────────────────
+
+// ─── Epoch Info Card ───────────────────────────────────────────────────────────
+
+function EpochInfoCard() {
+  const epoch = useEpoch();
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="mx-4 my-3 rounded-3xl p-5 relative overflow-hidden"
+      style={{
+        background: `linear-gradient(135deg, ${epoch.colors.background}f5 0%, ${epoch.colors.background}dd 100%)`,
+        border: `1px solid ${epoch.colors.primary}30`,
+        boxShadow: `0 0 40px ${epoch.colors.primary}15, inset 0 1px 0 ${epoch.colors.primary}10`,
+        backdropFilter: 'blur(20px)',
+      }}
+    >
+      {/* Decorative corner ornaments */}
+      <div className="absolute top-2 left-2 w-6 h-6 border-l border-t rounded-tl-xl" style={{ borderColor: `${epoch.colors.primary}40` }} />
+      <div className="absolute top-2 right-2 w-6 h-6 border-r border-t rounded-tr-xl" style={{ borderColor: `${epoch.colors.primary}40` }} />
+      <div className="absolute bottom-2 left-2 w-6 h-6 border-l border-b rounded-bl-xl" style={{ borderColor: `${epoch.colors.primary}40` }} />
+      <div className="absolute bottom-2 right-2 w-6 h-6 border-r border-b rounded-br-xl" style={{ borderColor: `${epoch.colors.primary}40` }} />
+
+      {/* Glow effect */}
+      <div 
+        className="absolute inset-0 rounded-3xl opacity-20"
+        style={{ background: `radial-gradient(ellipse at 50% 0%, ${epoch.colors.primary}30 0%, transparent 60%)` }}
+      />
+
+      {/* Content */}
+      <div className="relative z-10 text-center">
+        {/* Epoch name */}
+        <h2 
+          className="text-xl font-bold uppercase mb-1"
+          style={{ 
+            fontFamily: "'Cinzel', serif",
+            color: epoch.colors.primary,
+            letterSpacing: '0.2em',
+            textShadow: `0 0 20px ${epoch.colors.primary}50`,
+          }}
+        >
+          {epoch.name}
+        </h2>
+
+        {/* Period */}
+        <p 
+          className="text-xs uppercase tracking-[0.3em] mb-4"
+          style={{ 
+            fontFamily: "'Cinzel', serif",
+            color: `${epoch.colors.primary}80`,
+          }}
+        >
+          {epoch.period}
+        </p>
+
+        {/* Decorative divider */}
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <div className="h-px w-12" style={{ background: `linear-gradient(to right, transparent, ${epoch.colors.primary}50)` }} />
+          <span className="text-lg">{epoch.icon}</span>
+          <div className="h-px w-12" style={{ background: `linear-gradient(to left, transparent, ${epoch.colors.primary}50)` }} />
+        </div>
+
+        {/* Description */}
+        <p 
+          className="text-sm leading-relaxed"
+          style={{ 
+            color: epoch.colors.textPrimary,
+            opacity: 0.85,
+          }}
+        >
+          {epoch.description}
+        </p>
+      </div>
+    </motion.div>
+  );
+}
 
 function CornerOrnament({ flipX, flipY, epoch }: { flipX?: boolean; flipY?: boolean; epoch?: Epoch }) {
   const color = epoch?.colors.primary || "#F5C842";
@@ -440,7 +519,7 @@ function TapMedallion({ onTap, tapPower }: { onTap: () => void; tapPower: number
               letterSpacing: '0.5em',
             }}
           >
-            НАМІСТИ
+            НАТИСНИ
           </h2>
           {/* Decorative line under name */}
           <div className="flex items-center justify-center gap-3 mt-2">
@@ -513,14 +592,6 @@ function GameCanvas({ onTap, tapEvents, tapPower }: {
       <div className="absolute top-2 right-2 pointer-events-none"><CornerOrnament epoch={epoch} flipX /></div>
       <div className="absolute bottom-10 left-2 pointer-events-none"><CornerOrnament epoch={epoch} flipY /></div>
       <div className="absolute bottom-10 right-2 pointer-events-none"><CornerOrnament epoch={epoch} flipX flipY /></div>
-
-      {/* Era label */}
-      <div
-        className="absolute top-3 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[5px] font-semibold select-none"
-        style={{ fontFamily: "'Cinzel', serif", color: `${epoch.colors.primary}30` }}
-      >
-        {epoch.period}
-      </div>
 
       {/* Tap medallion */}
       <TapMedallion onTap={onTap} tapPower={tapPower} />
@@ -1138,7 +1209,12 @@ function TapPage() {
         ))}
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 z-10" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}><Navigation /></div>
+      {/* Epoch Info Card - historical information */}
+      <div className="absolute bottom-20 left-0 right-0 z-10">
+        <EpochInfoCard />
+      </div>
+
+      <div className="absolute bottom-0 left-0 right-0 z-20" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}><Navigation /></div>
     </div>
   );
 }
