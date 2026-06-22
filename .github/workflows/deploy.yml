@@ -2,9 +2,9 @@ name: Build and Deploy
 
 on:
   push:
-    branches: [main]
+    branches: [main, feat/wow-effects-epoch-selector]
   pull_request:
-    branches: [main]
+    branches: [main, feat/wow-effects-epoch-selector]
 
 jobs:
   build-and-deploy:
