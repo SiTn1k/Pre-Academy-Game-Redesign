@@ -757,11 +757,11 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { path: "/tap",        label: "Гра",      Icon: IcoGamepad  },
-  { path: "/",           label: "Завдання", Icon: IcoGem     },
-  { path: "/expedition", label: "Академія", Icon: IcoSword,  locked: true },
-  { path: "/profile",    label: "Профіль",  Icon: IcoUser     },
-  { path: "/settings",   label: "",         Icon: IcoSettings },
+  { path: "/tap",        label: "Гра",       Icon: IcoGamepad  },
+  { path: "/",           label: "Завдання",  Icon: IcoGem     },
+  { path: "/artifacts",  label: "Реліквії",  Icon: IcoGem,    badge: 2 },
+  { path: "/profile",    label: "Профіль",   Icon: IcoUser     },
+  { path: "/settings",   label: "",          Icon: IcoSettings },
 ];
 
 function Navigation() {
