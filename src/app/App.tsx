@@ -50,12 +50,109 @@ export const EPOCHS: Epoch[] = [
 // Current epoch (default - index 6 = Cossack era)
 const EPOCH = EPOCHS[6];
 
-const GENERATORS = [
-  { id: 1, name: "Козацький табір", icon: "⛺", level: 8,  production: 12,  cost: 24_000,  canBuyAt: 24_000  },
-  { id: 2, name: "Січ Запорозька",  icon: "🏰", level: 5,  production: 45,  cost: 87_000,  canBuyAt: 87_000  },
-  { id: 3, name: "Чайки та гармати",icon: "⚓", level: 3,  production: 120, cost: 210_000, canBuyAt: 210_000 },
-  { id: 4, name: "Гетьманська рада",icon: "📜", level: 1,  production: 310, cost: 580_000, canBuyAt: 580_000 },
-];
+// ─── Epoch Generators ───────────────────────────────────────────────────────────
+
+interface Generator {
+  id: number;
+  name: string;
+  icon: string;
+  level: number;
+  production: number;
+  cost: number;
+  canBuyAt: number;
+}
+
+// Generators for each epoch
+const EPOCH_GENERATORS: Record<number, Generator[]> = {
+  // 1. Трипільська культура
+  1: [
+    { id: 1, name: "Глиняна майстерня", icon: "🏺", level: 8, production: 12, cost: 24_000, canBuyAt: 24_000 },
+    { id: 2, name: "Поселення землеробів", icon: "🏠", level: 5, production: 45, cost: 87_000, canBuyAt: 87_000 },
+    { id: 3, name: "Святилище Трипілля", icon: "🛕", level: 3, production: 120, cost: 210_000, canBuyAt: 210_000 },
+    { id: 4, name: "Запаси зерна", icon: "🌾", level: 1, production: 310, cost: 580_000, canBuyAt: 580_000 },
+  ],
+  // 2. Скіфія
+  2: [
+    { id: 1, name: "Скіфський табір", icon: "⛺", level: 8, production: 14, cost: 26_000, canBuyAt: 26_000 },
+    { id: 2, name: "Кузня воїнів", icon: "⚒️", level: 5, production: 48, cost: 92_000, canBuyAt: 92_000 },
+    { id: 3, name: "Торговий караван", icon: "🐎", level: 3, production: 125, cost: 220_000, canBuyAt: 220_000 },
+    { id: 4, name: "Реміснича майстерня", icon: "🔨", level: 1, production: 320, cost: 600_000, canBuyAt: 600_000 },
+  ],
+  // 3. Сарматія
+  3: [
+    { id: 1, name: "Племінне поселення", icon: "🏕️", level: 8, production: 15, cost: 28_000, canBuyAt: 28_000 },
+    { id: 2, name: "Слов'янська дружина", icon: "⚔️", level: 5, production: 50, cost: 95_000, canBuyAt: 95_000 },
+    { id: 3, name: "Дерев'яна фортеця", icon: "🏰", level: 3, production: 130, cost: 230_000, canBuyAt: 230_000 },
+    { id: 4, name: "Запаси провізії", icon: "🫕", level: 1, production: 330, cost: 620_000, canBuyAt: 620_000 },
+  ],
+  // 4. Античні міста
+  4: [
+    { id: 1, name: "Грецька агора", icon: "🏛️", level: 8, production: 16, cost: 30_000, canBuyAt: 30_000 },
+    { id: 2, name: "Херсонесъкий портъ", icon: "⚓", level: 5, production: 52, cost: 98_000, canBuyAt: 98_000 },
+    { id: 3, name: "Ольвійська ткальня", icon: "🧵", level: 3, production: 135, cost: 240_000, canBuyAt: 240_000 },
+    { id: 4, name: "Виноробня", icon: "🍇", level: 1, production: 340, cost: 640_000, canBuyAt: 640_000 },
+  ],
+  // 5. Київська Русь
+  5: [
+    { id: 1, name: "Княжий двір", icon: "👑", level: 8, production: 18, cost: 32_000, canBuyAt: 32_000 },
+    { id: 2, name: "Майстерня зброярів", icon: "⚔️", level: 5, production: 55, cost: 100_000, canBuyAt: 100_000 },
+    { id: 3, name: "Київський торг", icon: "💰", level: 3, production: 140, cost: 250_000, canBuyAt: 250_000 },
+    { id: 4, name: "Дружина князя", icon: "🛡️", level: 1, production: 350, cost: 660_000, canBuyAt: 660_000 },
+  ],
+  // 6. Галицько-Волинське князівство
+  6: [
+    { id: 1, name: "Монетний двір", icon: "🪙", level: 8, production: 20, cost: 34_000, canBuyAt: 34_000 },
+    { id: 2, name: "Міська ратуша", icon: "🏛️", level: 5, production: 58, cost: 105_000, canBuyAt: 105_000 },
+    { id: 3, name: "Купецька гільдія", icon: "💎", level: 3, production: 145, cost: 260_000, canBuyAt: 260_000 },
+    { id: 4, name: "Ремісничий квартал", icon: "🔧", level: 1, production: 360, cost: 680_000, canBuyAt: 680_000 },
+  ],
+  // 7. Козацька доба (default)
+  7: [
+    { id: 1, name: "Козацький табір", icon: "⛺", level: 8, production: 12, cost: 24_000, canBuyAt: 24_000 },
+    { id: 2, name: "Січ Запорозька", icon: "🏰", level: 5, production: 45, cost: 87_000, canBuyAt: 87_000 },
+    { id: 3, name: "Чайки та гармати", icon: "⚓", level: 3, production: 120, cost: 210_000, canBuyAt: 210_000 },
+    { id: 4, name: "Гетьманська рада", icon: "📜", level: 1, production: 310, cost: 580_000, canBuyAt: 580_000 },
+  ],
+  // 8. Кримське ханство
+  8: [
+    { id: 1, name: "Кримський базар", icon: "🛒", level: 8, production: 22, cost: 36_000, canBuyAt: 36_000 },
+    { id: 2, name: "Бахчисарайський палацъ", icon: "🏯", level: 5, production: 60, cost: 108_000, canBuyAt: 108_000 },
+    { id: 3, name: "Караван-сарай", icon: "🐪", level: 3, production: 150, cost: 270_000, canBuyAt: 270_000 },
+    { id: 4, name: "Кримська митниця", icon: "📋", level: 1, production: 370, cost: 700_000, canBuyAt: 700_000 },
+  ],
+  // 9. Гетьманщина
+  9: [
+    { id: 1, name: "Полкова канцелярія", icon: "📜", level: 8, production: 24, cost: 38_000, canBuyAt: 38_000 },
+    { id: 2, name: "Старшинська рада", icon: "⚖️", level: 5, production: 62, cost: 112_000, canBuyAt: 112_000 },
+    { id: 3, name: "Артилерійська майстерня", icon: "💣", level: 3, production: 155, cost: 280_000, canBuyAt: 280_000 },
+    { id: 4, name: "Козацька скарбниця", icon: "💰", level: 1, production: 380, cost: 720_000, canBuyAt: 720_000 },
+  ],
+  // 10. Національне відродження
+  10: [
+    { id: 1, name: "Друкарня", icon: "📰", level: 8, production: 26, cost: 40_000, canBuyAt: 40_000 },
+    { id: 2, name: "Громадське товариство", icon: "🏛️", level: 5, production: 65, cost: 115_000, canBuyAt: 115_000 },
+    { id: 3, name: "Бібліотека", icon: "📚", level: 3, production: 160, cost: 290_000, canBuyAt: 290_000 },
+    { id: 4, name: "Освітня академія", icon: "🎓", level: 1, production: 390, cost: 740_000, canBuyAt: 740_000 },
+  ],
+  // 11. УНР
+  11: [
+    { id: 1, name: "Штаб УНР", icon: "🏢", level: 8, production: 28, cost: 42_000, canBuyAt: 42_000 },
+    { id: 2, name: "Військовий склад", icon: "📦", level: 5, production: 68, cost: 118_000, canBuyAt: 118_000 },
+    { id: 3, name: "Добровольчий загін", icon: "🎖️", level: 3, production: 165, cost: 300_000, canBuyAt: 300_000 },
+    { id: 4, name: "Польова радіостанція", icon: "📡", level: 1, production: 400, cost: 760_000, canBuyAt: 760_000 },
+  ],
+  // 12. Незалежна Україна
+  12: [
+    { id: 1, name: "Верховна Рада", icon: "🏛️", level: 8, production: 30, cost: 44_000, canBuyAt: 44_000 },
+    { id: 2, name: "Національний банкъ", icon: "🏦", level: 5, production: 70, cost: 120_000, canBuyAt: 120_000 },
+    { id: 3, name: "IT-компанія", icon: "💻", level: 3, production: 170, cost: 310_000, canBuyAt: 310_000 },
+    { id: 4, name: "Аеропорт Бориспіль", icon: "✈️", level: 1, production: 410, cost: 780_000, canBuyAt: 780_000 },
+  ],
+};
+
+function getGenerators(epochIndex: number): Generator[] {
+  return EPOCH_GENERATORS[epochIndex + 1] || EPOCH_GENERATORS[7]; // default to Cossack era
+}
 
 const TASKS = [
   { id: 1, icon: "👆", name: "Натисни 500 разів",    progress: 342, target: 500, reward: "2 500 🪙", claimed: false },
@@ -626,33 +723,47 @@ function BoosterBar({ boosts, energy, maxEnergy, streak }: {
 
 // ─── Generator Card ───────────────────────────────────────────────────────────
 
-function GeneratorCard({ gen, currency }: { gen: typeof GENERATORS[0]; currency: number }) {
+function GeneratorCard({ gen, currency, epoch }: { gen: Generator; currency: number; epoch: Epoch }) {
   const canBuy = currency >= gen.cost;
   return (
     <div className={`flex items-center gap-3 p-3 rounded-2xl border transition-all ${
-      canBuy ? "border-amber-400/20 bg-card" : "border-white/5 bg-card opacity-55"
-    }`}>
-      <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center shrink-0 text-xl">
+      canBuy ? "" : "opacity-55"
+    }`} style={{ 
+      borderColor: canBuy ? `${epoch.colors.primary}30` : `${epoch.colors.primary}10`,
+      backgroundColor: `${epoch.colors.background}f5`,
+    }}>
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-xl" style={{
+        backgroundColor: `${epoch.colors.primary}15`,
+        border: `1px solid ${epoch.colors.primary}30`,
+      }}>
         {gen.icon}
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 mb-0.5">
           <span className="text-white/90 text-sm font-semibold truncate">{gen.name}</span>
-          <span className="bg-amber-400/15 text-amber-400/80 text-[9px] font-bold px-1.5 py-0.5 rounded-md shrink-0">
+          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md shrink-0" style={{
+            backgroundColor: `${epoch.colors.primary}20`,
+            color: epoch.colors.primary,
+          }}>
             Lv.{gen.level}
           </span>
         </div>
-        <div className="text-green-400/70 text-[10px]">+{fmt(gen.production)} XP/с</div>
+        <div className="text-[10px]" style={{ color: epoch.colors.success }}>+{fmt(gen.production)} XP/с</div>
       </div>
       <div className="shrink-0">
         <button
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all active:scale-95 ${
-            canBuy ? "bg-primary text-primary-foreground hover:brightness-110" : "bg-white/5 text-white/25 cursor-not-allowed"
+            canBuy ? "" : "cursor-not-allowed"
           }`}
+          style={{
+            backgroundColor: canBuy ? epoch.colors.primary : `${epoch.colors.primary}20`,
+            color: canBuy ? epoch.colors.background : `${epoch.colors.primary}50`,
+            fontFamily: "'DM Mono', monospace",
+          }}
           disabled={!canBuy}
         >
-          <div className="text-[9px] opacity-70 leading-none">{EPOCH.currencyIcon}</div>
-          <div style={{ fontFamily: "'DM Mono', monospace" }}>{fmt(gen.cost)}</div>
+          <div className="text-[9px] opacity-70 leading-none">{epoch.currencyIcon}</div>
+          <div>{fmt(gen.cost)}</div>
         </button>
       </div>
     </div>
@@ -1147,18 +1258,21 @@ function TapPage() {
 
 function GameTasksPage() {
   const { state } = useGame();
+  const epoch = useEpoch();
+  const generators = getGenerators(state.currentEpochIndex);
+  
   return (
     <PageLayout>
       <div className="p-3 space-y-3">
         <DailyTasksCard />
         <div
-          className="text-white/25 text-[9px] uppercase tracking-[3px] px-1 pt-1"
-          style={{ fontFamily: "'Cinzel', serif" }}
+          className="text-[9px] uppercase tracking-[3px] px-1 pt-1"
+          style={{ fontFamily: "'Cinzel', serif", color: `${epoch.colors.primary}60` }}
         >
-          Генератори
+          Генератори {epoch.shortName}
         </div>
-        {GENERATORS.map(gen => (
-          <GeneratorCard key={gen.id} gen={gen} currency={state.currency} />
+        {generators.map(gen => (
+          <GeneratorCard key={gen.id} gen={gen} currency={state.currency} epoch={epoch} />
         ))}
         <div className="h-2" />
       </div>
